@@ -84,7 +84,7 @@ export default {
       },
       pagination: {
         defaultCurrent: 1,
-        defaultPageSize: 12,
+        defaultPageSize: 20,
         total: 0
       }
     }
