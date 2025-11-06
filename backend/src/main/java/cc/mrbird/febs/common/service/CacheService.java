@@ -1,5 +1,6 @@
 package cc.mrbird.febs.common.service;
 
+import cc.mrbird.febs.cos.entity.ScenicInfo;
 import cc.mrbird.febs.system.domain.Menu;
 import cc.mrbird.febs.system.domain.Role;
 import cc.mrbird.febs.system.domain.User;
@@ -109,5 +110,12 @@ public interface CacheService {
      * @param userId 用户 ID
      */
     void deleteUserConfigs(String userId) throws Exception;
+
+    /**
+     * 缓存景点信息
+     *
+     * @param scenicInfoList 景点信息
+     */
+    void setScenicToRedis(List<ScenicInfo> scenicInfoList);
 
 }

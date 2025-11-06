@@ -3,6 +3,7 @@ package cc.mrbird.febs.common.service.impl;
 import cc.mrbird.febs.common.domain.FebsConstant;
 import cc.mrbird.febs.common.service.CacheService;
 import cc.mrbird.febs.common.service.RedisService;
+import cc.mrbird.febs.cos.entity.ScenicInfo;
 import cc.mrbird.febs.system.dao.UserMapper;
 import cc.mrbird.febs.system.domain.Menu;
 import cc.mrbird.febs.system.domain.Role;
@@ -12,13 +13,18 @@ import cc.mrbird.febs.system.service.MenuService;
 import cc.mrbird.febs.system.service.RoleService;
 import cc.mrbird.febs.system.service.UserConfigService;
 import cc.mrbird.febs.system.service.UserService;
+import cn.hutool.core.collection.CollectionUtil;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service("cacheService")
 public class CacheServiceImpl implements CacheService {
@@ -43,6 +49,9 @@ public class CacheServiceImpl implements CacheService {
 
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Override
     public void testConnect() throws Exception {
@@ -152,5 +161,20 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public void deleteUserConfigs(String userId) throws Exception {
         redisService.del(FebsConstant.USER_CONFIG_CACHE_PREFIX + userId);
+    }
+
+    /**
+     * 缓存景点信息
+     *
+     * @param scenicInfoList 景点信息
+     */
+    @Override
+    public void setScenicToRedis(List<ScenicInfo> scenicInfoList) {
+        if (CollectionUtil.isEmpty(scenicInfoList)) {
+            return;
+        }
+        for (ScenicInfo scenicInfo : scenicInfoList) {
+            redisTemplate.opsForGeo().add(scenicInfo.getId(), new Point(scenicInfo.getPoint()));
+        }
     }
 }
