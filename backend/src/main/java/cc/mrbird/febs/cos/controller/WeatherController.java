@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * 天气查询接口
@@ -33,7 +34,8 @@ public class WeatherController {
         }
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            JsonNode rootNode = objectMapper.readTree(JSON_DATA);
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("city/city.json");
+            JsonNode rootNode = objectMapper.readTree(inputStream);
             JsonNode cityCodesArray = rootNode.get("城市代码");
             if (cityCodesArray != null && cityCodesArray.isArray()) {
                 // 3. 遍历省份/直辖市

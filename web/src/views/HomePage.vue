@@ -8,9 +8,9 @@
         </div>
       </a-col>
       <a-col :span="2">
-        <a-button type="primary" class="next-button" @click="newsNext">
+        <p type="primary" class="next-button" @click="newsNext">
           下一条
-        </a-button>
+        </p>
       </a-col>
     </a-row>
     <a-row :gutter="25" style="margin-bottom: 15px">
@@ -308,6 +308,8 @@ export default {
     width: 100%;
     height: 48px;
     border-radius: 0;
+    text-align: center;
+    line-height: 48px;
     border: none;
     background: linear-gradient(90deg, #4A90E2, #63B3ED);
     color: white;

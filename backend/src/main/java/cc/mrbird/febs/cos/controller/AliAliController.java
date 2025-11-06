@@ -1,7 +1,6 @@
 package cc.mrbird.febs.cos.controller;
 
 import cc.mrbird.febs.common.utils.R;
-import cc.mrbird.febs.cos.service.SseService;
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;

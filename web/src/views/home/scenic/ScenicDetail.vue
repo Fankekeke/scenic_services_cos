@@ -168,7 +168,7 @@ export default {
 
 /* 新增卡片美化样式 */
 /deep/ .ant-card {
-  border-radius: 3px;
+  border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;

@@ -52,17 +52,17 @@ public class ScenicOrderController {
         Circle circle = new Circle(lng, lat, 1000d);
         RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeDistance().includeCoordinates().limit(1);
 
-        GeoResults<RedisGeoCommands.GeoLocation<String>> geoResults = redisTemplate.opsForGeo().radius(CacheConstants.ROAD_POINT_IMAGE, circle, args);
+        GeoResults<RedisGeoCommands.GeoLocation<String>> geoResults = redisTemplate.opsForGeo().radius("SCENIC", circle, args);
         if (CollectionUtil.isEmpty(geoResults) || CollectionUtil.isEmpty(geoResults.getContent())) {
             return null;
         }
 
-        RedisGeoCommands.GeoLocation<String> geoLocation = geoResults.getContent().get(0).getContent();
-        String base64Image = redisTemplate.opsForValue().get(CacheConstants.ROAD_POINT_IMAGE_FLAG + geoLocation.getName());
-        if (StrUtil.isEmpty(base64Image)) {
-            return null;
-        }
-        return "data:image/jpeg;base64," + base64Image;
+//        RedisGeoCommands.GeoLocation<String> geoLocation = geoResults.getContent().get(0).getContent();
+//        String base64Image = redisTemplate.opsForValue().get(CacheConstants.ROAD_POINT_IMAGE_FLAG + geoLocation.getName());
+//        if (StrUtil.isEmpty(base64Image)) {
+//            return null;
+//        }
+        return null;
     }
 
     /**

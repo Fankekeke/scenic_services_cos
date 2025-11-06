@@ -14,14 +14,15 @@ import cc.mrbird.febs.system.service.RoleService;
 import cc.mrbird.febs.system.service.UserConfigService;
 import cc.mrbird.febs.system.service.UserService;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -173,8 +174,18 @@ public class CacheServiceImpl implements CacheService {
         if (CollectionUtil.isEmpty(scenicInfoList)) {
             return;
         }
+        Map<String, Point> points = new HashMap<>();
         for (ScenicInfo scenicInfo : scenicInfoList) {
-            redisTemplate.opsForGeo().add(scenicInfo.getId(), new Point(scenicInfo.getPoint()));
+            String pointStr = scenicInfo.getPoint();
+            if (StrUtil.isNotBlank(pointStr)) {
+                String[] coords = StrUtil.split(pointStr, ",");
+                if (coords.length >= 2) {
+                    double longitude = Double.parseDouble(coords[0]);
+                    double latitude = Double.parseDouble(coords[1]);
+                    points.put(scenicInfo.getId().toString(), new Point(114.48, 38.03));
+                }
+            }
         }
+        redisTemplate.opsForGeo().add("geo:point", points);
     }
 }
