@@ -33,7 +33,7 @@ public class Evaluation implements Serializable {
     /**
      * 评分
      */
-    private BigDecimal score;
+    private Double score;
 
     /**
      * 评价
@@ -49,6 +49,11 @@ public class Evaluation implements Serializable {
      * 所属订单
      */
     private Integer orderId;
+
+    /**
+     * 景点ID
+     */
+    private Integer scenicId;
 
     private Integer type;
 

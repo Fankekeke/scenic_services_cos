@@ -47,5 +47,9 @@ public class ScenicInfo implements Serializable {
 
     private String sold;
 
+    private Double latitude;
+
+    private Double longitude;
+
 
 }

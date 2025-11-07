@@ -2,6 +2,8 @@ package cc.mrbird.febs.common.runner;
 
 import cc.mrbird.febs.common.exception.RedisConnectException;
 import cc.mrbird.febs.common.service.CacheService;
+import cc.mrbird.febs.cos.entity.ScenicInfo;
+import cc.mrbird.febs.cos.service.IScenicInfoService;
 import cc.mrbird.febs.system.domain.User;
 import cc.mrbird.febs.system.manager.UserManager;
 import cc.mrbird.febs.system.service.UserService;
@@ -30,6 +32,9 @@ public class CacheInitRunner implements ApplicationRunner {
     private UserManager userManager;
 
     @Autowired
+    private IScenicInfoService scenicInfoService;
+
+    @Autowired
     private ConfigurableApplicationContext context;
 
     @Override
@@ -44,13 +49,15 @@ public class CacheInitRunner implements ApplicationRunner {
             for (User user : list) {
                 userManager.loadUserRedisCache(user);
             }
+            List<ScenicInfo> scenicInfoList = scenicInfoService.list();
+            cacheService.setScenicToRedis(scenicInfoList);
         } catch (Exception e) {
             log.error("缓存初始化失败，{}", e.getMessage());
             log.error(" ____   __    _   _ ");
             log.error("| |_   / /\\  | | | |");
             log.error("|_|   /_/--\\ |_| |_|__");
             log.error("                        ");
-            log.error("FEBS启动失败              ");
+            log.error("FANK启动失败              ");
             if (e instanceof RedisConnectException)
                 log.error("Redis连接异常，请检查Redis连接配置并确保Redis服务已启动");
             // 关闭 FEBS

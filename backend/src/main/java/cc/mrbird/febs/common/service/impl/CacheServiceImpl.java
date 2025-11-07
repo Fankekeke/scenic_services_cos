@@ -182,10 +182,10 @@ public class CacheServiceImpl implements CacheService {
                 if (coords.length >= 2) {
                     double longitude = Double.parseDouble(coords[0]);
                     double latitude = Double.parseDouble(coords[1]);
-                    points.put(scenicInfo.getId().toString(), new Point(114.48, 38.03));
+                    points.put(scenicInfo.getId().toString(), new Point(longitude, latitude));
                 }
             }
         }
-        redisTemplate.opsForGeo().add("geo:point", points);
+        redisTemplate.opsForGeo().add("geo:scenic", points);
     }
 }
