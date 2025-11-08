@@ -1,82 +1,98 @@
 <template>
   <div>
-    <div v-if="!loading" style="padding: 25px 80px">
-      <a-list item-layout="vertical" size="large" :pagination="pagination" :data-source="postList" v-show="!postDetailShow">
-        <a-list-item slot="renderItem" key="item.title" slot-scope="item, index">
-          <template slot="actions">
+    <div>
+      <div v-if="!loading" style="padding: 25px 80px">
+        <!-- 原有的帖子列表 -->
+        <a-list item-layout="vertical" size="large" :pagination="pagination" :data-source="postList"
+                v-show="!postDetailShow">
+          <a-list-item slot="renderItem" key="item.title" slot-scope="item, index">
+            <template slot="actions">
             <span key="to-top">
-              <a-icon type="to-top" style="margin-right: 8px" />
+              <a-icon type="to-top" style="margin-right: 8px"/>
               {{ timeFormat(item.createDate) }}
             </span>
-          </template>
-          <a-list-item-meta :description="item.content.slice(0, 100) + '...'">
-            <a slot="title" @click="postInfoDetail(item.id)">{{ item.title }}</a>
-            <a-avatar shape="square" slot="avatar" :src="'http://127.0.0.1:9527/imagesWeb/' + item.avatar" />
-          </a-list-item-meta>
-        </a-list-item>
-      </a-list>
-    </div>
-    <div v-if="postDetailShow && postDetail !== null" style="margin: 18px">
-      <div style="margin-bottom: 10px">
-        <a-breadcrumb>
-          <a-breadcrumb-item><a @click="postDetailShow = false">返回</a></a-breadcrumb-item>
-          <a-breadcrumb-item>{{ postDetail.title }}</a-breadcrumb-item>
-        </a-breadcrumb>
-      </div>
-      <p style="font-size: 22px;color: black;font-weight: 500;line-height: 150%;margin: 25px 50px;margin-top: 50px">
-        {{ postDetail.title }}
-      </p>
-      <div style="margin: 25px 50px;font-size: 13px">
-        <a-divider type="vertical" />
-        {{ timeFormat(postDetail.createDate) }}
-      </div>
-      <div style="margin: 25px 50px;font-size: 15px;line-height: 1.6;word-break: break-word;letter-spacing: 1px;text-indent: 30px">
-        {{ postDetail.content }}
-      </div>
-      <div style="margin: 25px 50px;height: 100px">
-        <a-upload
-          name="avatar"
-          action="http://127.0.0.1:9527/file/fileUpload/"
-          list-type="picture-card"
-          :file-list="fileList"
-          @preview="handlePreview"
-        >
-        </a-upload>
-        <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
-          <img alt="example" style="width: 100%" :src="previewImage" />
-        </a-modal>
-      </div>
-      <div style="margin: 25px 50px;">
-        <a-list
-          class="comment-list"
-          :pagination="pagination"
-          :header="`${replyList.length} 回复`"
-          item-layout="horizontal"
-          :data-source="replyList"
-        >
-          <a-list-item slot="renderItem" slot-scope="item, index">
-            <a-comment :author="item.username" shape="square" :avatar="'http://127.0.0.1:9527/imagesWeb/' + item.avatar">
-              <template slot="actions">
-                <span @click="replyUserAdd(item)">回复</span>
-              </template>
-              <p slot="content" style="white-space: pre-line;">
-                {{ item.content }}
-              </p>
-              <a-tooltip slot="datetime" :title="item.sendCreate">
-                <span>{{ timeFormat(item.createDate) }}</span>
-              </a-tooltip>
-            </a-comment>
+            </template>
+            <a-list-item-meta :description="item.content.slice(0, 100) + '...'">
+              <a slot="title" @click="postInfoDetail(item.id)">{{ item.title }}</a>
+              <a-avatar shape="square" slot="avatar" :src="'http://127.0.0.1:9527/imagesWeb/' + item.avatar"/>
+            </a-list-item-meta>
           </a-list-item>
         </a-list>
-        <div style="margin-bottom: 200px;margin-top: 50px">
-          <a-textarea
-            v-model="replyContent"
-            placeholder="Controlled autosize"
-            :rows="5"
-          />
-          <a-button type="primary" style="float: right;margin-top: 15px" @click="commit">
-            提交
-          </a-button>
+      </div>
+
+      <!-- 添加加载中的提示 -->
+      <div v-else class="loading-container">
+        <a-spin size="large" tip="正在加载论坛帖子...">
+          <div class="loading-content">
+            <a-icon type="loading" style="font-size: 24px; margin-bottom: 16px;"/>
+            <p>正在努力加载数据，请稍候...</p>
+          </div>
+        </a-spin>
+      </div>
+      <div v-if="postDetailShow && postDetail !== null" style="margin: 18px">
+        <div style="margin-bottom: 10px">
+          <a-breadcrumb>
+            <a-breadcrumb-item><a @click="postDetailShow = false">返回</a></a-breadcrumb-item>
+            <a-breadcrumb-item>{{ postDetail.title }}</a-breadcrumb-item>
+          </a-breadcrumb>
+        </div>
+        <p style="font-size: 22px;color: black;font-weight: 500;line-height: 150%;margin: 25px 50px;margin-top: 50px">
+          {{ postDetail.title }}
+        </p>
+        <div style="margin: 25px 50px;font-size: 13px">
+          <a-divider type="vertical"/>
+          {{ timeFormat(postDetail.createDate) }}
+        </div>
+        <div
+          style="margin: 25px 50px;font-size: 15px;line-height: 1.6;word-break: break-word;letter-spacing: 1px;text-indent: 30px">
+          {{ postDetail.content }}
+        </div>
+        <div style="margin: 25px 50px;height: 100px">
+          <a-upload
+            name="avatar"
+            action="http://127.0.0.1:9527/file/fileUpload/"
+            list-type="picture-card"
+            :file-list="fileList"
+            @preview="handlePreview"
+          >
+          </a-upload>
+          <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
+            <img alt="example" style="width: 100%" :src="previewImage"/>
+          </a-modal>
+        </div>
+        <div style="margin: 25px 50px;">
+          <a-list
+            class="comment-list"
+            :pagination="pagination"
+            :header="`${replyList.length} 回复`"
+            item-layout="horizontal"
+            :data-source="replyList"
+          >
+            <a-list-item slot="renderItem" slot-scope="item, index">
+              <a-comment :author="item.username" shape="square"
+                         :avatar="'http://127.0.0.1:9527/imagesWeb/' + item.avatar">
+                <template slot="actions">
+                  <span @click="replyUserAdd(item)">回复</span>
+                </template>
+                <p slot="content" style="white-space: pre-line;">
+                  {{ item.content }}
+                </p>
+                <a-tooltip slot="datetime" :title="item.sendCreate">
+                  <span>{{ timeFormat(item.createDate) }}</span>
+                </a-tooltip>
+              </a-comment>
+            </a-list-item>
+          </a-list>
+          <div style="margin-bottom: 200px;margin-top: 50px">
+            <a-textarea
+              v-model="replyContent"
+              placeholder="Controlled autosize"
+              :rows="5"
+            />
+            <a-button type="primary" style="float: right;margin-top: 15px" @click="commit">
+              提交
+            </a-button>
+          </div>
         </div>
       </div>
     </div>
@@ -85,6 +101,7 @@
 
 <script>
 import {mapState} from 'vuex'
+
 function getBase64 (file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -93,6 +110,7 @@ function getBase64 (file) {
     reader.onerror = error => reject(error)
   })
 }
+
 export default {
   name: 'Post',
   computed: {
@@ -229,6 +247,23 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped>/* 添加加载容器样式 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 50px 0;
+}
+
+.loading-content {
+  text-align: center;
+  color: #8c8c8c;
+}
+
+.loading-content p {
+  margin: 0;
+  font-size: 16px;
+}
 
 </style>

@@ -154,6 +154,40 @@
               </div>
             </a-col>
           </a-row>
+          <a-row style="padding-left: 24px; padding-right: 24px; background: #f8f9fa; padding: 20px;margin-top: 25px">
+            <a-col style="margin-bottom: 15px">
+              <span style="font-size: 18px; font-weight: 600; color: #000c17; border-left: 4px solid #1890ff; padding-left: 10px;">景点介绍</span>
+            </a-col>
+            <a-col :span="24">
+              <a-spin :spinning="aiLoading" tip="AI分析中..." class="ai-spin">
+                <div v-if="aiAnalysisResult" class="ai-content">
+                  <a-alert type="info" show-icon class="ai-result-alert">
+                    <template slot="message">
+                      <div v-html="formatAiResult(aiAnalysisResult)" class="ai-result-content"></div>
+                      <div style="text-align: right; margin-top: 10px;">
+                        <a-button
+                          type="primary"
+                          shape="circle"
+                          :icon="isPlaying ? 'pause' : 'sound'"
+                          @click="toggleSpeech"
+                          :loading="speechLoading"
+                          size="small"
+                        >
+                        </a-button>
+                      </div>
+                    </template>
+                  </a-alert>
+                </div>
+                <div v-else class="ai-placeholder">
+                  <a-empty description="暂无AI分析结果" class="ai-empty">
+                    <a-button type="primary" @click="queryAiContent" :loading="aiLoading" class="ai-generate-btn">
+                      <a-icon type="thunderbolt" /> 生成AI介绍
+                    </a-button>
+                  </a-empty>
+                </div>
+              </a-spin>
+            </a-col>
+          </a-row>
         </a-col>
       </a-row>
     </div>
@@ -185,6 +219,12 @@ export default {
   },
   data () {
     return {
+      isPlaying: false,
+      speechLoading: false,
+      speechSynthesis: null,
+      utterance: null,
+      aiLoading: false, // 添加 AI 加载状态
+      aiAnalysisResult: '', // 添加 AI 分析结果
       nowPoint: null,
       loading: false,
       weatherData: null,
@@ -205,7 +245,99 @@ export default {
       }
     }
   },
+  beforeDestroy () {
+    this.stopSpeech()
+  },
   methods: {
+    // 添加文字转语音功能
+    toggleSpeech () {
+      if (!this.aiAnalysisResult) {
+        this.$message.warning('暂无内容可播放')
+        return
+      }
+
+      if (!this.speechSynthesis) {
+        this.speechSynthesis = window.speechSynthesis
+      }
+
+      if (this.isPlaying) {
+        // 停止播放
+        this.stopSpeech()
+      } else {
+        // 开始播放
+        this.playSpeech()
+      }
+    },
+
+    playSpeech () {
+      this.speechLoading = true
+
+      try {
+        // 清理HTML标签，只保留纯文本
+        const plainText = this.aiAnalysisResult.replace(/<[^>]*>/g, '')
+
+        // 创建语音对象
+        this.utterance = new SpeechSynthesisUtterance(plainText)
+        this.utterance.lang = 'zh-CN'
+        this.utterance.rate = 1
+        this.utterance.pitch = 1
+
+        // 设置事件监听
+        this.utterance.onstart = () => {
+          this.isPlaying = true
+          this.speechLoading = false
+        }
+
+        this.utterance.onend = () => {
+          this.isPlaying = false
+        }
+
+        this.utterance.onerror = () => {
+          this.isPlaying = false
+          this.speechLoading = false
+          // this.$message.error('语音播放出错')
+        }
+
+        // 开始播放
+        this.speechSynthesis.speak(this.utterance)
+      } catch (error) {
+        this.speechLoading = false
+        this.$message.error('浏览器不支持语音播放功能')
+        console.error('Speech synthesis error:', error)
+      }
+    },
+
+    stopSpeech () {
+      if (this.speechSynthesis && this.utterance) {
+        this.speechSynthesis.cancel()
+        this.isPlaying = false
+      }
+    },
+    formatAiResult (result) {
+      if (!result) return ''
+      // 简单的换行符替换为 HTML 换行
+      return result.replace(/\n/g, '<br>')
+    },
+    queryAiContent () {
+      this.aiLoading = true
+      let weatherText = '天气预测：\n'
+      if (this.weatherData.data.forecast) {
+        for (let i = 0; i < 3; i++) {
+          weatherText += this.weatherData.data.forecast[i].ymd + '，' + this.weatherData.data.forecast[i].type + '，' + this.weatherData.data.forecast[i].high + '，' + this.weatherData.data.forecast[i].low + '\n'
+        }
+      }
+      let params = '请介绍景点-' + this.scenicData.scenicName + '的，并规划附近的可玩景点，300字内' + weatherText
+      this.$post(`/cos/ai/aliTyqw`, {
+        content: params
+      }).then((r) => {
+        this.aiAnalysisResult = r.data.msg
+      }).catch((error) => {
+        this.$message.error('AI分析失败，请稍后重试')
+        console.error('AI分析错误:', error)
+      }).finally(() => {
+        this.aiLoading = false
+      })
+    },
     queryWeather () {
       this.$get('/cos/weather-info/queryWeatherByCity', {
         city: '朝阳'

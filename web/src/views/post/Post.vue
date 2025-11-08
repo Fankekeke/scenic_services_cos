@@ -1,6 +1,6 @@
 <template>
   <div :class="[multipage === true ? 'multi-page':'single-page', 'not-menu-page', 'home-page']" style="width: 68%;margin: 0 auto">
-    <a-card bordered style="margin-left: -14px;margin-right: -14px;padding: 12px;">
+    <a-card :bordered="false" style="margin-left: -14px;margin-right: -14px;padding: 12px;">
       <post/>
     </a-card>
   </div>
@@ -8,6 +8,7 @@
 <script>
 import HeadInfo from '@/views/common/HeadInfo'
 import Scenic from '@/views/home/scenic/Scenic'
+import Post from '@/views/home/post/Post'
 import User from '@/views/user/user/User'
 import { getUrlKey } from '@/utils/urlKey'
 import {mapState} from 'vuex'
@@ -16,7 +17,7 @@ moment.locale('zh-cn')
 
 export default {
   name: 'HomePage',
-  components: {HeadInfo, Scenic, User, Post,},
+  components: {HeadInfo, Scenic, User, Post},
   data () {
     return {
       newsPage: 0,
