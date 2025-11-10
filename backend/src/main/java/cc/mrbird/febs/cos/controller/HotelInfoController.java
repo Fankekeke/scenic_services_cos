@@ -45,6 +45,7 @@ public class HotelInfoController {
 
     /**
      * 根据用户ID获取酒店信息
+     *
      * @param userId
      * @return
      */
@@ -54,7 +55,6 @@ public class HotelInfoController {
     }
 
     /**
-     *
      * @return
      */
     @GetMapping("/list")
@@ -64,6 +64,7 @@ public class HotelInfoController {
 
     /**
      * 分页查询民宿信息
+     *
      * @param page
      * @param hotelInfo
      * @return
@@ -75,6 +76,7 @@ public class HotelInfoController {
 
     /**
      * 添加酒店信息
+     *
      * @param hotelInfo
      * @return
      */
@@ -86,6 +88,7 @@ public class HotelInfoController {
 
     /**
      * 修改酒店信息
+     *
      * @param hotelInfo
      * @return
      */
@@ -96,6 +99,7 @@ public class HotelInfoController {
 
     /**
      * 删除酒店信息
+     *
      * @param ids
      * @return
      */

@@ -30,6 +30,7 @@ public class RoomTypeController {
 
     /**
      * 分页查询房间类型
+     *
      * @param page
      * @param roomType
      * @return
@@ -41,6 +42,7 @@ public class RoomTypeController {
 
     /**
      * 添加房间类型
+     *
      * @param roomType
      * @return
      */
@@ -54,6 +56,7 @@ public class RoomTypeController {
 
     /**
      * 查询当前房间余量
+     *
      * @param roomId
      * @return
      */
@@ -64,6 +67,7 @@ public class RoomTypeController {
 
     /**
      * 修改房间类型
+     *
      * @param roomType
      * @return
      */
@@ -74,6 +78,7 @@ public class RoomTypeController {
 
     /**
      * 删除房间类型
+     *
      * @param ids
      * @return
      */

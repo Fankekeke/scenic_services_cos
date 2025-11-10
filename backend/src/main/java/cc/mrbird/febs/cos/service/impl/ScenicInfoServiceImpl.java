@@ -1,12 +1,9 @@
 package cc.mrbird.febs.cos.service.impl;
 
-import cc.mrbird.febs.cos.entity.Evaluation;
-import cc.mrbird.febs.cos.entity.ScenicInfo;
+import cc.mrbird.febs.cos.entity.*;
 import cc.mrbird.febs.cos.dao.ScenicInfoMapper;
-import cc.mrbird.febs.cos.entity.UserInfo;
-import cc.mrbird.febs.cos.service.IEvaluationService;
-import cc.mrbird.febs.cos.service.IScenicInfoService;
-import cc.mrbird.febs.cos.service.IUserInfoService;
+import cc.mrbird.febs.cos.service.*;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author FanK
@@ -26,6 +24,12 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
     private final IEvaluationService evaluationService;
 
     private final IUserInfoService userInfoService;
+
+    private final IHotelInfoService hotelInfoService;
+
+    private final IRoomTypeService roomTypeService;
+
+    private final IOrderInfoService orderInfoService;
 
     /**
      * 推荐景点
@@ -81,6 +85,150 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
         }
 
         return recommendedScenics;
+    }
+
+    /**
+     * 推荐酒店
+     *
+     * @param lat  纬度
+     * @param lng  经度
+     * @param type 类型  1.附近一公里类 2.附近三公里内 3.附近五公里内 4.评分4.0以上
+     * @return 结果
+     */
+    @Override
+    public List<LinkedHashMap<String, Object>> queryHotelByPosition(Double lat, Double lng, Integer type) {
+        // 获取所有酒店信息
+        List<HotelInfo> allHotelList = hotelInfoService.list(Wrappers.<HotelInfo>lambdaQuery());
+        if (CollectionUtil.isEmpty(allHotelList)) {
+            return Collections.emptyList();
+        }
+        for (HotelInfo hotelInfo : allHotelList) {
+            if (StrUtil.isEmpty(hotelInfo.getPoint())) {
+                continue;
+            }
+            double latitude = Double.parseDouble(hotelInfo.getPoint().split(",")[0]);
+            double longitude = Double.parseDouble(hotelInfo.getPoint().split(",")[1]);
+            hotelInfo.setLongitude(longitude);
+            hotelInfo.setLatitude(latitude);
+        }
+
+        List<HotelInfo> filteredHotels;
+        // 根据不同类型进行筛选
+        switch (type) {
+            case 1:
+                // 附近一公里内
+                filteredHotels = allHotelList.stream()
+                        .filter(hotel -> calculateDistance(lat, lng, hotel.getLatitude(), hotel.getLongitude()) <= 1)
+                        .collect(Collectors.toList());
+                break;
+            case 2:
+                // 附近三公里内
+                filteredHotels = allHotelList.stream()
+                        .filter(hotel -> calculateDistance(lat, lng, hotel.getLatitude(), hotel.getLongitude()) <= 3)
+                        .collect(Collectors.toList());
+                break;
+            case 3:
+                // 附近五公里内
+                filteredHotels = allHotelList.stream()
+                        .filter(hotel -> calculateDistance(lat, lng, hotel.getLatitude(), hotel.getLongitude()) <= 5)
+                        .collect(Collectors.toList());
+                break;
+            case 4:
+                // 评分4.0以上
+                filteredHotels = allHotelList.stream()
+                        .filter(hotel -> hotel.getScore() != null && hotel.getScore() >= 4.0)
+                        .collect(Collectors.toList());
+                break;
+            default:
+                filteredHotels = allHotelList;
+                break;
+        }
+
+        // 酒店房间
+        if (CollectionUtil.isEmpty(filteredHotels)) {
+            return Collections.emptyList();
+        }
+        List<Integer> hotelIds = filteredHotels.stream().map(HotelInfo::getId).collect(Collectors.toList());
+        List<RoomType> roomList = roomTypeService.list(Wrappers.<RoomType>lambdaQuery().in(RoomType::getHotelId, hotelIds));
+        Map<Integer, List<RoomType>> roomMap = roomList.stream().collect(Collectors.groupingBy(RoomType::getHotelId));
+
+        // 转换为 LinkedHashMap 列表
+        List<LinkedHashMap<String, Object>> result = new ArrayList<>();
+        for (HotelInfo hotel : filteredHotels) {
+            LinkedHashMap<String, Object> hotelMap = new LinkedHashMap<>();
+            hotelMap.put("id", hotel.getId());
+            hotelMap.put("name", hotel.getName());
+            hotelMap.put("address", hotel.getAddress());
+            hotelMap.put("score", hotel.getScore());
+            hotelMap.put("point", hotel.getPoint());
+            hotelMap.put("distance", calculateDistance(lat, lng, hotel.getLatitude(), hotel.getLongitude()));
+            hotelMap.put("roomType", roomMap.get(hotel.getId()));
+            result.add(hotelMap);
+        }
+
+        // 按距离排序
+        if (lat != null && lng != null && type != 4) {
+            result.sort(Comparator.comparingDouble(hotel -> (Double) hotel.get("distance")));
+        } else if (type == 4) {
+            // 按评分排序
+            result.sort((h1, h2) -> Double.compare((Double) h2.get("score"), (Double) h1.get("score")));
+        }
+
+        return result;
+    }
+
+    /**
+     * 查询酒店可订房间
+     *
+     * @param hotelIds 酒店ID
+     * @return 结果
+     */
+    public LinkedHashMap<String, Object> queryRoomByHotel(List<Integer> hotelIds) {
+        // 酒店房间
+        List<RoomType> roomList = roomTypeService.list(Wrappers.<RoomType>lambdaQuery().in(RoomType::getHotelId, hotelIds));
+        // 房间订单
+        List<OrderInfo> orderList = orderInfoService.list(Wrappers.<OrderInfo>lambdaQuery().in(OrderInfo::getHotelId, hotelIds).eq(OrderInfo::getDelFlag, 0));
+        if (CollectionUtil.isEmpty(roomList)) {
+            return null;
+        }
+
+        // 按酒店ID分组的房间类型余量
+        LinkedHashMap<String, Object> result = new LinkedHashMap<>();
+
+        // 按酒店ID对房间进行分组
+        Map<Integer, List<RoomType>> roomsByHotel = roomList.stream()
+                .collect(Collectors.groupingBy(RoomType::getHotelId));
+        // 按酒店ID对订单进行分组
+        Map<Integer, List<OrderInfo>> ordersByHotel = orderList.stream()
+                .collect(Collectors.groupingBy(OrderInfo::getHotelId));
+        // 计算每个酒店每个房间类型的余量
+        for (Map.Entry<Integer, List<RoomType>> hotelEntry : roomsByHotel.entrySet()) {
+            Integer hotelId = hotelEntry.getKey();
+            List<RoomType> hotelRooms = hotelEntry.getValue();
+            List<OrderInfo> hotelOrders = ordersByHotel.getOrDefault(hotelId, new ArrayList<>());
+            // 按房间类型ID对订单进行分组
+            Map<Integer, List<OrderInfo>> ordersByRoomType = hotelOrders.stream()
+                    .collect(Collectors.groupingBy(OrderInfo::getTypeId));
+            // 计算每个房间类型的余量
+            List<LinkedHashMap<String, Object>> roomAvailability = new ArrayList<>();
+            for (RoomType room : hotelRooms) {
+                int totalRooms = room.getNum(); // 总房间数
+                List<OrderInfo> roomOrders = ordersByRoomType.getOrDefault(room.getId(), new ArrayList<>());
+                int bookedRooms = roomOrders.size(); // 已预订房间数
+                int availableRooms = totalRooms - bookedRooms; // 剩余房间数
+
+                LinkedHashMap<String, Object> roomInfo = new LinkedHashMap<>();
+                roomInfo.put("roomId", room.getId());
+                roomInfo.put("roomName", room.getName());
+                roomInfo.put("totalRooms", totalRooms);
+                roomInfo.put("bookedRooms", bookedRooms);
+                roomInfo.put("availableRooms", availableRooms);
+                roomInfo.put("price", room.getPrice());
+                roomAvailability.add(roomInfo);
+            }
+            result.put("hotel_" + hotelId, roomAvailability);
+        }
+        return result;
     }
 
     /**

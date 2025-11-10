@@ -1,5 +1,6 @@
 package cc.mrbird.febs.cos.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.List;
@@ -73,7 +74,17 @@ public class HotelInfo implements Serializable {
 
     private Long userId;
 
+    /**
+     * 评分
+     */
+    private Double score;
+
     @TableField(exist = false)
     private List<RoomType> roomTypes;
 
+    @TableField(exist = false)
+    private Double latitude;
+
+    @TableField(exist = false)
+    private Double longitude;
 }

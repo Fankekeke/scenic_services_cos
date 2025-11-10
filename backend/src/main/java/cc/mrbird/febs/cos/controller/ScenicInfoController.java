@@ -78,6 +78,19 @@ public class ScenicInfoController {
     }
 
     /**
+     * 推荐酒店
+     *
+     * @param lat  纬度
+     * @param lng  经度
+     * @param type 类型  1.附近一公里类 2.附近三公里内 3.附近五公里内 4.评分4.0以上
+     * @return 结果
+     */
+    @GetMapping("/queryHotelByPosition")
+    public R queryHotelByPosition(Double lat, Double lng, Integer type) {
+        return R.ok(scenicInfoService.queryHotelByPosition(lat, lng, type));
+    }
+
+    /**
      * 分页查询景点信息
      *
      * @param page
