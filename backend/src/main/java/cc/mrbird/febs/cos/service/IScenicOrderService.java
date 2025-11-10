@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * @author FanK
@@ -20,4 +21,12 @@ public interface IScenicOrderService extends IService<ScenicOrder> {
      * @return
      */
     IPage<LinkedHashMap<String, Object>> scenicInfoByPage(Page page, ScenicOrder scenicOrder);
+
+    /**
+     * 查询本月景点流量排行榜
+     *
+     * @param date 统计日期
+     * @return 结果
+     */
+    List<LinkedHashMap<String, Object>> queryScenicTop(String date);
 }

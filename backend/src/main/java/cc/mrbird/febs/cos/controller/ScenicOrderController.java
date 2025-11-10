@@ -36,6 +36,7 @@ public class ScenicOrderController {
 
     /**
      * 分页查询景点订单
+     *
      * @param page
      * @param scenicOrder
      * @return
@@ -50,7 +51,19 @@ public class ScenicOrderController {
     }
 
     /**
+     * 查询本月景点流量排行榜
+     *
+     * @param date 统计日期
+     * @return 结果
+     */
+    @GetMapping("/queryScenicTop")
+    public R queryScenicTop(@RequestParam String date) {
+        return R.ok(scenicOrderService.queryScenicTop(date));
+    }
+
+    /**
      * 订单销票
+     *
      * @param orderId
      * @return
      */
@@ -61,6 +74,7 @@ public class ScenicOrderController {
 
     /**
      * 添加景区订单
+     *
      * @param scenicOrder
      * @return
      */
@@ -71,6 +85,7 @@ public class ScenicOrderController {
 
     /**
      * 修改景区订单
+     *
      * @param scenicOrder
      * @return
      */
@@ -81,6 +96,7 @@ public class ScenicOrderController {
 
     /**
      * 删除景区订单
+     *
      * @param ids
      * @return
      */
