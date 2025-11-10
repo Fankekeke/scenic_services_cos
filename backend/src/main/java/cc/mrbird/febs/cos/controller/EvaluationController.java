@@ -30,9 +30,10 @@ public class EvaluationController {
 
     /**
      * 分页查询评价信息
-     * @param page
-     * @param evaluation
-     * @return
+     *
+     * @param page       分页对象
+     * @param evaluation 评价信息
+     * @return 结果
      */
     @GetMapping("/page")
     public R page(Page page, Evaluation evaluation) {
@@ -40,7 +41,31 @@ public class EvaluationController {
     }
 
     /**
+     * 分页查询景区评价信息
+     *
+     * @param page       分页对象
+     * @param evaluation 评价信息
+     * @return 结果
+     */
+    @GetMapping("/page")
+    public R queryScenicEvaluatePage(Page<Evaluation> page, Evaluation evaluation) {
+        return R.ok(evaluationService.queryScenicEvaluatePage(page, evaluation));
+    }
+
+    /**
+     * 查询用户评价信息
+     *
+     * @param scenicId 景区ID
+     * @return 结果
+     */
+    @GetMapping("/queryEvaluateByScenicId")
+    public R queryEvaluateByScenicId(Integer scenicId) {
+        return R.ok(evaluationService.queryEvaluateByScenicId(scenicId));
+    }
+
+    /**
      * 添加评价信息
+     *
      * @param evaluation
      * @return
      */
@@ -53,6 +78,7 @@ public class EvaluationController {
 
     /**
      * 删除评价信息
+     *
      * @param ids
      * @return
      */

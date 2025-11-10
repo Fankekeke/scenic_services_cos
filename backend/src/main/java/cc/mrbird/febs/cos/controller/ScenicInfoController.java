@@ -65,6 +65,19 @@ public class ScenicInfoController {
     }
 
     /**
+     * 推荐景点
+     *
+     * @param lat    纬度
+     * @param lng    经度
+     * @param userId 用户ID
+     * @return 结果
+     */
+    @GetMapping("/queryScenicRecommend")
+    public R queryScenicRecommend(Double lat, Double lng, Integer userId) {
+        return R.ok(scenicInfoService.queryScenicRecommend(lat, lng, userId));
+    }
+
+    /**
      * 分页查询景点信息
      *
      * @param page

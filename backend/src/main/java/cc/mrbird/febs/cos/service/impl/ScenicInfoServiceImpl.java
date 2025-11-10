@@ -30,10 +30,10 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
     /**
      * 推荐景点
      *
-     * @param lat
-     * @param lng
+     * @param lat    纬度
+     * @param lng    经度
      * @param userId 用户ID
-     * @return
+     * @return 结果
      */
     @Override
     public List<ScenicInfo> queryScenicRecommend(Double lat, Double lng, Integer userId) {
@@ -120,7 +120,7 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
         Map<Integer, Map<Integer, Double>> userScenicRatingMatrix = new HashMap<>();
 
         // 获取所有用户评价数据
-        List<Evaluation> allEvaluations = evaluationService.list();
+        List<Evaluation> allEvaluations = evaluationService.list(Wrappers.<Evaluation>lambdaQuery().eq(Evaluation::getType, 2));
 
         // 构建矩阵
         for (Evaluation evaluation : allEvaluations) {
@@ -138,7 +138,7 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
     /**
      * 计算用户相似度（基于余弦相似度）
      *
-     * @param targetUserId 目标用户ID
+     * @param targetUserId           目标用户ID
      * @param userScenicRatingMatrix 用户-景点评分矩阵
      * @return 用户相似度映射
      */
@@ -150,15 +150,12 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
         if (targetUserRatings == null) {
             return userSimilarity;
         }
-
         for (Map.Entry<Integer, Map<Integer, Double>> entry : userScenicRatingMatrix.entrySet()) {
             Integer userId = entry.getKey();
             if (userId.equals(targetUserId)) {
                 continue; // 跳过目标用户自身
             }
-
             Map<Integer, Double> userRatings = entry.getValue();
-
             // 计算余弦相似度
             double similarity = cosineSimilarity(targetUserRatings, userRatings);
             if (similarity > 0) { // 只保留正相关用户
@@ -182,13 +179,11 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
         commonScenicIds.retainAll(ratings2.keySet());
 
         if (commonScenicIds.isEmpty()) {
-            return 0; // 没有共同评分的景点
+            return 0;
         }
-
         double dotProduct = 0.0;
         double norm1 = 0.0;
         double norm2 = 0.0;
-
         for (Integer scenicId : commonScenicIds) {
             double rating1 = ratings1.get(scenicId);
             double rating2 = ratings2.get(scenicId);
@@ -196,19 +191,17 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
             norm1 += rating1 * rating1;
             norm2 += rating2 * rating2;
         }
-
         if (norm1 == 0 || norm2 == 0) {
             return 0;
         }
-
         return dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
     }
 
     /**
      * 预测评分
      *
-     * @param targetUserId 目标用户ID
-     * @param userSimilarity 用户相似度映射
+     * @param targetUserId           目标用户ID
+     * @param userSimilarity         用户相似度映射
      * @param userScenicRatingMatrix 用户-景点评分矩阵
      * @return 预测评分映射
      */
@@ -221,17 +214,14 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
         if (targetUserRatings == null) {
             return predictions;
         }
-
         // 获取目标用户未评分的景点
         Set<Integer> allScenicIds = userScenicRatingMatrix.values().stream()
                 .flatMap(map -> map.keySet().stream())
                 .collect(java.util.stream.Collectors.toSet());
-
         for (Integer scenicId : allScenicIds) {
             if (targetUserRatings.containsKey(scenicId)) {
                 continue; // 跳过已评分的景点
             }
-
             double weightedSum = 0.0;
             double similaritySum = 0.0;
 
@@ -239,7 +229,6 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
             for (Map.Entry<Integer, Double> similarityEntry : userSimilarity.entrySet()) {
                 Integer similarUserId = similarityEntry.getKey();
                 Double similarity = similarityEntry.getValue();
-
                 Map<Integer, Double> similarUserRatings = userScenicRatingMatrix.get(similarUserId);
                 if (similarUserRatings != null && similarUserRatings.containsKey(scenicId)) {
                     Double rating = similarUserRatings.get(scenicId);
@@ -247,12 +236,10 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
                     similaritySum += Math.abs(similarity);
                 }
             }
-
             if (similaritySum > 0) {
                 predictions.put(scenicId, weightedSum / similaritySum);
             }
         }
-
         return predictions;
     }
 
@@ -260,7 +247,7 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
      * 根据预测评分排序并过滤景点
      *
      * @param predictedRatings 预测评分映射
-     * @param allScenicList 所有景点列表
+     * @param allScenicList    所有景点列表
      * @return 推荐景点列表
      */
     private List<ScenicInfo> sortAndFilterScenics(Map<Integer, Double> predictedRatings,

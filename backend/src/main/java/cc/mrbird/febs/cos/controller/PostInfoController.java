@@ -10,6 +10,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.houbb.sensitive.word.core.SensitiveWordHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,7 @@ public class PostInfoController {
 
     /**
      * 根据贴子ID获取回复信息
+     *
      * @param postId
      * @return
      */
@@ -41,6 +43,7 @@ public class PostInfoController {
 
     /**
      * 分页查询帖子信息
+     *
      * @param page
      * @param postInfo
      * @return
@@ -56,6 +59,7 @@ public class PostInfoController {
 
     /**
      * 获取详情
+     *
      * @param postId
      * @return
      */
@@ -66,6 +70,7 @@ public class PostInfoController {
 
     /**
      * 查询帖子信息
+     *
      * @return
      */
     @GetMapping("/list")
@@ -75,6 +80,7 @@ public class PostInfoController {
 
     /**
      * 新增帖子信息
+     *
      * @param postInfo
      * @return
      */
@@ -83,21 +89,37 @@ public class PostInfoController {
         UserInfo userInfo = userInfoService.getOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getUserId, postInfo.getUserId()));
         postInfo.setUserId(userInfo.getId());
         postInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
+        // 敏感词校验替换
+        if (SensitiveWordHelper.contains(postInfo.getTitle())) {
+            postInfo.setTitle(SensitiveWordHelper.replace(postInfo.getTitle()));
+        }
+        if (SensitiveWordHelper.contains(postInfo.getContent())) {
+            postInfo.setContent(SensitiveWordHelper.replace(postInfo.getContent()));
+        }
         return R.ok(postInfoService.save(postInfo));
     }
 
     /**
      * 修改帖子信息
+     *
      * @param postInfo
      * @return
      */
     @PutMapping
     public R edit(PostInfo postInfo) {
+        // 敏感词校验替换
+        if (SensitiveWordHelper.contains(postInfo.getTitle())) {
+            postInfo.setTitle(SensitiveWordHelper.replace(postInfo.getTitle()));
+        }
+        if (SensitiveWordHelper.contains(postInfo.getContent())) {
+            postInfo.setContent(SensitiveWordHelper.replace(postInfo.getContent()));
+        }
         return R.ok(postInfoService.updateById(postInfo));
     }
 
     /**
      * 删除帖子信息
+     *
      * @param ids
      * @return
      */

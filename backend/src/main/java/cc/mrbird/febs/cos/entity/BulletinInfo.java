@@ -49,5 +49,10 @@ public class BulletinInfo implements Serializable {
      */
     private String publisher;
 
+    /**
+     * 类型 （1.景区公告 2.活动通知 3.紧急消息）
+     */
+    private String type;
+
 
 }

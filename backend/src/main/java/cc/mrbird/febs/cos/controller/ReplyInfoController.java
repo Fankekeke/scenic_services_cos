@@ -11,6 +11,7 @@ import cc.mrbird.febs.cos.service.IUserInfoService;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.houbb.sensitive.word.core.SensitiveWordHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,7 @@ public class ReplyInfoController {
 
     /**
      * 分页查询回复信息
+     *
      * @param page
      * @param replyInfo
      * @return
@@ -43,6 +45,7 @@ public class ReplyInfoController {
 
     /**
      * 添加回复信息
+     *
      * @param replyInfo
      * @return
      */
@@ -51,11 +54,15 @@ public class ReplyInfoController {
         UserInfo userInfo = userInfoService.getOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getUserId, replyInfo.getUserId()));
         replyInfo.setUserId(userInfo.getId());
         replyInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
+        if (SensitiveWordHelper.contains(replyInfo.getContent())) {
+            replyInfo.setContent(SensitiveWordHelper.replace(replyInfo.getContent()));
+        }
         return R.ok(replyInfoService.save(replyInfo));
     }
 
     /**
      * 删除回复信息
+     *
      * @param ids
      * @return
      */

@@ -31,7 +31,7 @@
             AND ui.name LIKE CONCAT('%',#{evaluation.userName},'%')
         </if>
         <if test="evaluation.userId != null">
-            AND hi.user_id LIKE CONCAT('%',#{evaluation.userId},'%')
+            AND hi.user_id = #{evaluation.userId}
         </if>
         <if test="evaluation.hotelName != null and evaluation.hotelName != ''">
             AND hi.name LIKE CONCAT('%',#{evaluation.hotelName},'%')
@@ -39,6 +39,16 @@
         <if test="evaluation.roomName != null and evaluation.roomName != ''">
             AND rt.name LIKE CONCAT('%',#{evaluation.roomName},'%')
         </if>
+    </select>
+
+    <!-- 分页查询景区评价信息 -->
+    <select id="queryScenicEvaluatePage" resultType="java.util.LinkedHashMap">
+
+    </select>
+
+    <!-- 获取景点评价 -->
+    <select id="queryEvaluateByScenicId" resultType="java.util.LinkedHashMap">
+
     </select>
 
     <!-- 获取房间评价 -->

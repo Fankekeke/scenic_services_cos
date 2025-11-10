@@ -22,6 +22,29 @@ public class EvaluationServiceImpl extends ServiceImpl<EvaluationMapper, Evaluat
         return baseMapper.evaluationByPage(page, evaluation);
     }
 
+    /**
+     * 分页查询景区评价信息
+     *
+     * @param page       分页对象
+     * @param evaluation 评价信息
+     * @return 结果
+     */
+    @Override
+    public IPage<LinkedHashMap<String, Object>> queryScenicEvaluatePage(Page<Evaluation> page, Evaluation evaluation) {
+        return baseMapper.queryScenicEvaluatePage(page, evaluation);
+    }
+
+    /**
+     * 获取景点评价
+     *
+     * @param scenicId 景区ID
+     * @return 结果
+     */
+    @Override
+    public List<LinkedHashMap<String, Object>> queryEvaluateByScenicId(Integer scenicId) {
+        return baseMapper.queryEvaluateByScenicId(scenicId);
+    }
+
     @Override
     public List<LinkedHashMap<String, Object>> getEvaluationByRoomType(Integer roomTypeId) {
         return baseMapper.getEvaluationByRoomType(roomTypeId);
