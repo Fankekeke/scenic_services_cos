@@ -105,18 +105,6 @@ public class ScenicInfoController {
     }
 
     /**
-     * 推荐景点
-     *
-     * @param lat
-     * @param lng
-     * @return
-     */
-    @GetMapping("/queryScenicRecommend")
-    public R queryScenicRecommend(Double lat, Double lng) {
-        return R.ok();
-    }
-
-    /**
      * 添加景点信息
      *
      * @param scenicInfo

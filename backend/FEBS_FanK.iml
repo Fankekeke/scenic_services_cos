@@ -178,5 +178,11 @@
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.8.21" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.8.21" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains:annotations:13.0" level="project" />
+    <orderEntry type="library" name="Maven: com.github.houbb:sensitive-word:0.29.2" level="project" />
+    <orderEntry type="library" name="Maven: com.github.houbb:heaven:0.13.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apiguardian:apiguardian-api:1.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.github.houbb:opencc4j:1.8.1" level="project" />
+    <orderEntry type="library" name="Maven: com.github.houbb:nlp-common:0.0.5" level="project" />
+    <orderEntry type="library" name="Maven: com.github.houbb:sensitive-word-data:1.0.0" level="project" />
   </component>
 </module>

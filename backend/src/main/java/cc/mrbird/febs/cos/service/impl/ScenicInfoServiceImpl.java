@@ -1,5 +1,6 @@
 package cc.mrbird.febs.cos.service.impl;
 
+import cc.mrbird.febs.cos.dao.OrderInfoMapper;
 import cc.mrbird.febs.cos.entity.*;
 import cc.mrbird.febs.cos.dao.ScenicInfoMapper;
 import cc.mrbird.febs.cos.service.*;
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -29,7 +31,8 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
 
     private final IRoomTypeService roomTypeService;
 
-    private final IOrderInfoService orderInfoService;
+    @Lazy
+    private final OrderInfoMapper orderInfoService;
 
     /**
      * 推荐景点
@@ -187,7 +190,7 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
         // 酒店房间
         List<RoomType> roomList = roomTypeService.list(Wrappers.<RoomType>lambdaQuery().in(RoomType::getHotelId, hotelIds));
         // 房间订单
-        List<OrderInfo> orderList = orderInfoService.list(Wrappers.<OrderInfo>lambdaQuery().in(OrderInfo::getHotelId, hotelIds).eq(OrderInfo::getDelFlag, 0));
+        List<OrderInfo> orderList = orderInfoService.selectList(Wrappers.<OrderInfo>lambdaQuery().in(OrderInfo::getHotelId, hotelIds).eq(OrderInfo::getDelFlag, 0));
         if (CollectionUtil.isEmpty(roomList)) {
             return null;
         }
