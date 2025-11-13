@@ -35,9 +35,21 @@ public class EvaluationController {
      * @param evaluation 评价信息
      * @return 结果
      */
-    @GetMapping("/page")
+    @GetMapping("/scenic/page")
     public R queryScenicEvaluatePage(Page<Evaluation> page, Evaluation evaluation) {
         return R.ok(evaluationService.queryScenicEvaluatePage(page, evaluation));
+    }
+
+    /**
+     * 分页查询酒店评价信息
+     *
+     * @param page       分页对象
+     * @param evaluation 评价信息
+     * @return 评价信息
+     */
+    @GetMapping("/hotel/page")
+    public R evaluationByPage(Page<Evaluation> page, Evaluation evaluation) {
+        return R.ok(evaluationService.evaluationByPage(page, evaluation));
     }
 
     /**

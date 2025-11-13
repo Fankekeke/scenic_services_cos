@@ -55,6 +55,9 @@ public class Evaluation implements Serializable {
      */
     private Integer scenicId;
 
+    /**
+     * 评价类型 (1.酒店 2.景点)
+     */
     private Integer type;
 
     private String images;
@@ -63,6 +66,8 @@ public class Evaluation implements Serializable {
     private String userName;
     @TableField(exist = false)
     private String hotelName;
+    @TableField(exist = false)
+    private String scenicName;
     @TableField(exist = false)
     private String roomName;
     @TableField(exist = false)

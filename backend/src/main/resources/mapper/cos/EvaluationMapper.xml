@@ -23,7 +23,7 @@
         LEFT JOIN room_type rt ON ( rt.id = oi.type_id )
         LEFT JOIN hotel_info hi ON ( hi.id = oi.hotel_id )
         WHERE
-        1 = 1
+        1 = 1 AND eva.type = 1
         <if test="evaluation.code != null and evaluation.code != ''">
             AND oi.code LIKE CONCAT('%',#{evaluation.code},'%')
         </if>
@@ -39,16 +39,69 @@
         <if test="evaluation.roomName != null and evaluation.roomName != ''">
             AND rt.name LIKE CONCAT('%',#{evaluation.roomName},'%')
         </if>
+        ORDER BY eva.create_date DESC
     </select>
 
     <!-- 分页查询景区评价信息 -->
     <select id="queryScenicEvaluatePage" resultType="java.util.LinkedHashMap">
-
+        SELECT
+        eva.id,
+        eva.score,
+        eva.content,
+        eva.create_date AS createDate,
+        oi.code,
+        oi.price,
+        oi.day_num AS dayNum,
+        ui.name AS userName,
+        ui.avatar,
+        si.name AS scenicName,
+        FROM
+        evaluation eva
+        LEFT JOIN order_info oi ON (oi.id = eva.order_id)
+        LEFT JOIN user_info ui ON ( ui.id = oi.user_id )
+        LEFT JOIN scenic_info si ON ( si.id = oi.scenic_id )
+        WHERE
+        1 = 1 AND eva.type = 2
+        <if test="evaluation.code != null and evaluation.code != ''">
+            AND oi.code LIKE CONCAT('%',#{evaluation.code},'%')
+        </if>
+        <if test="evaluation.userName != null and evaluation.userName != ''">
+            AND ui.name LIKE CONCAT('%',#{evaluation.userName},'%')
+        </if>
+        <if test="evaluation.userId != null">
+            AND ui.user_id = #{evaluation.userId}
+        </if>
+        <if test="evaluation.hotelName != null and evaluation.hotelName != ''">
+            AND si.name LIKE CONCAT('%',#{evaluation.hotelName},'%')
+        </if>
+        ORDER BY eva.create_date DESC
     </select>
 
     <!-- 获取景点评价 -->
     <select id="queryEvaluateByScenicId" resultType="java.util.LinkedHashMap">
-
+        SELECT
+        eva.id,
+        eva.score,
+        eva.content,
+        eva.scenic_id,
+        eva.create_date AS createDate,
+        oi.code,
+        oi.price,
+        oi.day_num AS dayNum,
+        ui.name AS userName,
+        ui.avatar,
+        si.name AS scenicName,
+        FROM
+        evaluation eva
+        LEFT JOIN order_info oi ON (oi.id = eva.order_id)
+        LEFT JOIN user_info ui ON ( ui.id = oi.user_id )
+        LEFT JOIN scenic_info si ON ( si.id = oi.scenic_id )
+        WHERE
+        1 = 1 AND eva.type = 2
+        <if test="scenicId != null and scenicId != ''">
+            AND eva.scenic_id = #{scenicId}
+        </if>
+        ORDER BY eva.create_date DESC
     </select>
 
     <!-- 获取房间评价 -->
