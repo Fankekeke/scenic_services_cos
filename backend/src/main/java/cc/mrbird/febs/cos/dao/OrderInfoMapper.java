@@ -1,11 +1,13 @@
 package cc.mrbird.febs.cos.dao;
 
 import cc.mrbird.febs.cos.entity.OrderInfo;
+import cc.mrbird.febs.cos.entity.OrderItem;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -16,6 +18,7 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
 
     /**
      * 分页查询订单信息
+     *
      * @param page
      * @param orderInfo
      * @return
@@ -24,6 +27,7 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
 
     /**
      * 根据酒店ID获取统计信息
+     *
      * @param hotelId
      * @return
      */
@@ -31,6 +35,7 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
 
     /**
      * 订单量统计
+     *
      * @param hotelId
      * @return
      */
@@ -38,6 +43,7 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
 
     /**
      * 交易类型统计
+     *
      * @param hotelId
      * @return
      */
@@ -45,8 +51,19 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
 
     /**
      * 根据用户获取订单
+     *
      * @param userId
      * @return
      */
     List<LinkedHashMap<String, Object>> getOrderByUserId(@Param("userId") Integer userId);
+
+    /**
+     * 获取历史销售数据
+     *
+     * @param scenicId
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    List<OrderItem> getHistoricalSalesByDrugId(@Param("scenicId") Integer scenicId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

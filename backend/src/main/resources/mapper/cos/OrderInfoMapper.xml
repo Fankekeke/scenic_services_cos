@@ -139,4 +139,30 @@
         1 = 1
         AND oi.user_id = #{ userId }
     </select>
+
+    <!-- 获取历史销售数据 -->
+    <select id="getHistoricalSalesByDrugId" resultType="cc.mrbird.febs.cos.entity.OrderItem">
+        WITH RECURSIVE DateSeries AS (
+            -- 锚点成员 (Anchor Member): 设置起始日期
+            SELECT CAST(#{startTime} AS DATE) AS days
+            UNION ALL
+            -- 递归成员 (Recursive Member): 递增日期直到结束日期
+            SELECT DATE_ADD(days, INTERVAL 1 DAY)
+            FROM DateSeries
+            WHERE days &lt; CAST(#{endTime} AS DATE)
+        )
+        SELECT
+            DATE_FORMAT( t.days, '%Y-%m-%d' ) AS date,
+        IFNULL(sum(od.quantity), 0) AS quantity
+        FROM
+            DateSeries t
+            LEFT JOIN
+            order_info oi
+        ON DATE_FORMAT( oi.create_date, '%Y-%m-%d' ) = DATE_FORMAT( t.days, '%Y-%m-%d' )
+            LEFT JOIN order_detail od ON (od.order_id = oi.id and od.drug_id = #{drugId})
+        GROUP BY
+            t.days
+        ORDER BY
+            t.days ASC;
+    </select>
 </mapper>
