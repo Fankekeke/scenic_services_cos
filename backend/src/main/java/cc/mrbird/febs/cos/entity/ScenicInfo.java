@@ -48,6 +48,11 @@ public class ScenicInfo implements Serializable {
 
     private String sold;
 
+    /**
+     * 评分
+     */
+    private Double score;
+
     @TableField(exist = false)
     private Double latitude;
 

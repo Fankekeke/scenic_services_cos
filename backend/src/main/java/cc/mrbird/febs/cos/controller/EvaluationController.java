@@ -3,9 +3,14 @@ package cc.mrbird.febs.cos.controller;
 
 import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.Evaluation;
+import cc.mrbird.febs.cos.entity.HotelInfo;
+import cc.mrbird.febs.cos.entity.ScenicInfo;
 import cc.mrbird.febs.cos.entity.UserInfo;
 import cc.mrbird.febs.cos.service.IEvaluationService;
+import cc.mrbird.febs.cos.service.IHotelInfoService;
+import cc.mrbird.febs.cos.service.IScenicInfoService;
 import cc.mrbird.febs.cos.service.IUserInfoService;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -27,6 +32,10 @@ public class EvaluationController {
     private final IEvaluationService evaluationService;
 
     private final IUserInfoService userInfoService;
+
+    private final IScenicInfoService scenicInfoService;
+
+    private final IHotelInfoService hotelInfoService;
 
     /**
      * 分页查询景区评价信息
@@ -73,7 +82,28 @@ public class EvaluationController {
     public R save(Evaluation evaluation) {
         evaluation.setCode("EVA-" + System.currentTimeMillis());
         evaluation.setCreateDate(DateUtil.formatDateTime(new Date()));
-        return R.ok(evaluationService.save(evaluation));
+
+        evaluationService.save(evaluation);
+        if (evaluation.getType() == 1) {
+            HotelInfo hotelInfo = hotelInfoService.getById(evaluation.getHotelId());
+            List<Evaluation> evaluationList = evaluationService.list(Wrappers.<Evaluation>lambdaQuery().eq(Evaluation::getHotelId, hotelInfo.getId()));
+            if (CollectionUtil.isEmpty(evaluationList)) {
+                hotelInfo.setScore(3.0);
+            } else {
+                hotelInfo.setScore(evaluationList.stream().mapToDouble(Evaluation::getScore).average().getAsDouble());
+            }
+            hotelInfoService.updateById(hotelInfo);
+        } else {
+            ScenicInfo scenicInfo = scenicInfoService.getById(evaluation.getScenicId());
+            List<Evaluation> evaluationList = evaluationService.list(Wrappers.<Evaluation>lambdaQuery().eq(Evaluation::getScenicId, scenicInfo.getId()));
+            if (CollectionUtil.isEmpty(evaluationList)) {
+                scenicInfo.setScore(3.0);
+            } else {
+                scenicInfo.setScore(evaluationList.stream().mapToDouble(Evaluation::getScore).average().getAsDouble());
+            }
+            scenicInfoService.updateById(scenicInfo);
+        }
+        return R.ok(true);
     }
 
     /**

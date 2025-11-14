@@ -56,6 +56,11 @@ public class Evaluation implements Serializable {
     private Integer scenicId;
 
     /**
+     * 酒店ID
+     */
+    private Integer hotelId;
+
+    /**
      * 评价类型 (1.酒店 2.景点)
      */
     private Integer type;
