@@ -105,4 +105,26 @@ public class ScenicOrderController {
         return R.ok(scenicOrderService.removeByIds(ids));
     }
 
+    /**
+     * 年统计订单及收益
+     *
+     * @param date 年份
+     * @return 结果
+     */
+    @GetMapping("/statistics/year")
+    public R selectStoreStatisticsByYear(String date) {
+        return R.ok(scenicOrderService.selectStoreStatisticsByYear(date));
+    }
+
+    /**
+     * 月统计订单及收益
+     *
+     * @param date 日期
+     * @return 结果
+     */
+    @GetMapping("/statistics/month")
+    public R selectStoreStatisticsByMonth(String date) {
+        return R.ok(scenicOrderService.selectStoreStatisticsByMonth(date));
+    }
+
 }

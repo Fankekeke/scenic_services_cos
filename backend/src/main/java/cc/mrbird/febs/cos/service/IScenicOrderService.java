@@ -16,6 +16,7 @@ public interface IScenicOrderService extends IService<ScenicOrder> {
 
     /**
      * 分页查询景点订单
+     *
      * @param page
      * @param scenicOrder
      * @return
@@ -29,4 +30,20 @@ public interface IScenicOrderService extends IService<ScenicOrder> {
      * @return 结果
      */
     List<LinkedHashMap<String, Object>> queryScenicTop(String date);
+
+    /**
+     * 年统计订单及收益
+     *
+     * @param date 年份
+     * @return 结果
+     */
+    LinkedHashMap<String, Object> selectStoreStatisticsByYear(String date);
+
+    /**
+     * 月统计订单及收益
+     *
+     * @param date 日期
+     * @return 结果
+     */
+    LinkedHashMap<String, Object> selectStoreStatisticsByMonth(String date);
 }

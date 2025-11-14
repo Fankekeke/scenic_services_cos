@@ -87,4 +87,13 @@ public class OrderInfo implements Serializable {
 
     @TableField(exist = false)
     private String roomName;
+
+    @TableField(exist = false)
+    private Integer month;
+
+    @TableField(exist = false)
+    private Integer year;
+
+    @TableField(exist = false)
+    private Integer day;
 }
