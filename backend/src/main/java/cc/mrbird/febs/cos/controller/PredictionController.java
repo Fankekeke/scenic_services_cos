@@ -17,12 +17,12 @@ public class PredictionController {
     private final IPredictionService predictionService;
 
     /**
-     * 预测药品销售量
+     * 预测景点销售量
      */
     @GetMapping("/sales")
-    public R predictSales(@RequestParam Integer drugId,
+    public R predictSales(@RequestParam Integer scenicId,
                           @RequestParam(defaultValue = "7") Integer days) {
-        return R.ok(predictionService.predictSales(drugId, days));
+        return R.ok(predictionService.predictSales(scenicId, days));
     }
 
 }

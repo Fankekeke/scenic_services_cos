@@ -61,54 +61,46 @@
     <a-row :gutter="8" class="count-info" v-show="user.roleId == 74">
       <a-col :span="8" class="visit-count-wrapper">
         <a-card>
-          <div v-if="scenicShow" class="scenicInfo" style="height: 670px; overflow-y: auto">
-            <img :src="scenicData.webImg" alt="" width="100%"
-                 style="height: 180px;object-fit: cover">
-            <a-card :title="scenicData.name">
-              <a slot="extra" @click="scenicBack">返回</a>
-              <a-tabs default-active-key="1">
+          <div v-if="scenicShow" class="scenicInfo detail-card" style="height: 670px; overflow-y: auto">
+            <img :src="scenicData.webImg" alt="" class="detail-image">
+            <a-card :title="scenicData.name" class="content-card">
+              <a slot="extra" @click="scenicBack" class="back-link">← 返回</a>
+              <a-tabs default-active-key="1" class="detail-tabs">
                 <a-tab-pane key="1" tab="基础信息">
-                  <ul>
-                    <li>地址：{{ scenicData.address }}</li>
-                    <br/>
-                    <li>等级：{{ scenicData.level }}</li>
-                    <br/>
-                    <li>开园时间：{{ scenicData.startDate }} ~ {{ scenicData.endDate }}</li>
-                    <br/>
-                    <li>门票：{{ scenicData.price }} 元</li>
-                    <br/>
-                    <li>景区特色：{{ scenicData.feature }}</li>
+                  <ul class="info-list">
+                    <li><span class="info-label">地址：</span>{{ scenicData.address }}</li>
+                    <li><span class="info-label">等级：</span>{{ scenicData.level }}</li>
+                    <!--            <li><span class="info-label">开园时间：</span>{{ scenicData.startDate }} ~ {{ scenicData.endDate }}</li>-->
+                    <li><span class="info-label">门票：</span><span class="price">{{ scenicData.scenicPrice }} 元</span></li>
+                    <li><span class="info-label">景区介绍：</span>{{ scenicData.history }}</li>
                   </ul>
                 </a-tab-pane>
                 <a-tab-pane key="2" tab="路线规划">
-                  <a-timeline>
+                  <a-timeline class="route-timeline">
                     <a-timeline-item v-for="(item,index) in roadData" :key="index">
-                      <div v-html="item"></div>
+                      <div v-html="item" class="route-step"></div>
                     </a-timeline-item>
                   </a-timeline>
                 </a-tab-pane>
               </a-tabs>
             </a-card>
           </div>
-          <div v-if="hotelShow" class="scenicInfo" style="height: 670px; overflow-y: auto">
-            <img :src="'http://127.0.0.1:9527/imagesWeb/'+hotelData.images.split(',')[0]" alt="" width="100%"
-                 style="height: 180px;object-fit: cover">
-            <a-card :title="hotelData.name">
-              <a slot="extra" @click="hotelBack">返回</a>
-              <a-tabs default-active-key="1">
+          <div v-if="hotelShow" class="scenicInfo detail-card" style="height: 670px; overflow-y: auto">
+            <img :src="'http://127.0.0.1:9527/imagesWeb/'+hotelData.images.split(',')[0]" alt="" class="detail-image">
+            <a-card :title="hotelData.name" class="content-card">
+              <a slot="extra" @click="hotelBack" class="back-link">← 返回</a>
+              <a-tabs default-active-key="1" class="detail-tabs">
                 <a-tab-pane key="1" tab="基础信息">
-                  <ul>
-                    <li>地址：{{ hotelData.address }}</li>
-                    <br/>
-                    <li>备注：{{ hotelData.content }}</li>
-                    <br/>
-                    <li>政策：{{ hotelData.policy }}</li>
+                  <ul class="info-list">
+                    <li><span class="info-label">地址：</span>{{ hotelData.address }}</li>
+                    <li><span class="info-label">备注：</span>{{ hotelData.content }}</li>
+                    <li><span class="info-label">政策：</span>{{ hotelData.policy }}</li>
                   </ul>
                 </a-tab-pane>
                 <a-tab-pane key="2" tab="路线规划">
-                  <a-timeline>
+                  <a-timeline class="route-timeline">
                     <a-timeline-item v-for="(item,index) in roadData" :key="index">
-                      <div v-html="item"></div>
+                      <div v-html="item" class="route-step"></div>
                     </a-timeline-item>
                   </a-timeline>
                 </a-tab-pane>
@@ -116,29 +108,65 @@
             </a-card>
           </div>
           <a-tabs default-active-key="1" v-if="!scenicShow && !hotelShow">
-            <a-tab-pane key="1" tab="景点" style="height: 600px; overflow-y: auto">
-              <a-card @click="scenicDetail(item)" hoverable style="width: 100%;margin-bottom: 15px"
-                      v-for="(item, index) in scenicList" :key="index">
+            <a-tab-pane key="1" tab="景点" class="list-tab">
+              <a-card
+                @click="scenicDetail(item)"
+                hoverable
+                class="item-card"
+                v-for="(item, index) in scenicList"
+                :key="index"
+              >
                 <a-popover v-if="item.webImg !== null">
                   <template slot="content">
                     <a-avatar shape="square" :size="132" icon="user" :src="item.webImg"/>
                   </template>
-                  <a-avatar shape="square" :size="70" icon="user" style="margin-bottom: 15px;margin-right: 10px" :src="item.webImg"/>
+                  <a-avatar
+                    shape="square"
+                    :size="70"
+                    icon="user"
+                    class="item-avatar"
+                    :src="item.webImg"
+                  />
                 </a-popover>
-                <a-card-meta :title="item.scenicName" :description="item.history.slice(0, 40)+'...'">
-                </a-card-meta>
+                <div class="item-content">
+                  <a-card-meta
+                    :title="item.scenicName"
+                    :description="item.history.slice(0, 40)+'...'"
+                    class="item-meta"
+                  />
+                </div>
               </a-card>
             </a-tab-pane>
-            <a-tab-pane key="2" tab="民宿">
-              <a-card  @click="hotelDetail(item)" hoverable style="width: 100%;margin-bottom: 15px" v-for="(item, index) in hotelList" :key="index" v-if="item.images !== null">
+
+            <!-- 酒店列表项美化 -->
+            <a-tab-pane key="2" tab="酒店" class="list-tab">
+              <a-card
+                @click="hotelDetail(item)"
+                hoverable
+                class="item-card"
+                v-for="(item, index) in hotelList"
+                :key="index"
+                v-if="item.images !== null"
+              >
                 <a-popover v-if="item.images !== null" v-for="(item1, index1) in item.images.split(',')" :key="index1">
                   <template slot="content">
                     <a-avatar shape="square" :size="132" icon="user" :src="'http://127.0.0.1:9527/imagesWeb/'+item1"/>
                   </template>
-                  <a-avatar shape="square" :size="70" icon="user" style="margin-bottom: 15px;margin-right: 10px" :src="'http://127.0.0.1:9527/imagesWeb/'+item1"/>
+                  <a-avatar
+                    shape="square"
+                    :size="70"
+                    icon="user"
+                    class="item-avatar"
+                    :src="'http://127.0.0.1:9527/imagesWeb/'+item1"
+                  />
                 </a-popover>
-                <a-card-meta :title="item.name" :description="item.content.slice(0, 25)+'...'">
-                </a-card-meta>
+                <div class="item-content">
+                  <a-card-meta
+                    :title="item.name"
+                    :description="item.content.slice(0, 25)+'...'"
+                    class="item-meta"
+                  />
+                </div>
               </a-card>
             </a-tab-pane>
           </a-tabs>
@@ -481,6 +509,121 @@ export default {
 </script>
 <style lang="less">
 .home-page {
+  .detail-card {
+    .detail-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .content-card {
+      border-radius: 0 0 8px 8px;
+
+      .back-link {
+        color: #1890ff;
+        font-size: 14px;
+        &:hover {
+          color: #40a9ff;
+        }
+      }
+    }
+
+    .detail-tabs {
+      .ant-tabs-tab {
+        font-size: 16px;
+        font-weight: 500;
+      }
+    }
+
+    .info-list {
+      list-style: none;
+      padding: 0;
+
+      li {
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .info-label {
+          font-weight: bold;
+          color: #595959;
+        }
+
+        .price {
+          color: #ff4d4f;
+          font-weight: bold;
+          font-size: 16px;
+        }
+      }
+    }
+
+    .route-timeline {
+      .route-step {
+        font-size: 14px;
+        line-height: 1.6;
+      }
+    }
+  }
+
+  // 列表项样式
+  .list-tab {
+    height: 600px;
+    overflow-y: auto;
+
+    .item-card {
+      margin-bottom: 15px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .item-avatar {
+        margin-bottom: 15px;
+        margin-right: 15px;
+        border: 2px solid #f0f0f0;
+      }
+
+      .item-content {
+        display: inline-block;
+
+        .item-meta {
+          .ant-card-meta-title {
+            font-size: 16px;
+            font-weight: 600;
+          }
+
+          .ant-card-meta-description {
+            color: #8c8c8c;
+          }
+        }
+      }
+    }
+  }
+
+  // 地图容器美化
+  #areas {
+    width: 100%;
+    height: 710px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+
+  // 图表卡片美化
+  .visit-count {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
   .head-info {
     margin-bottom: .5rem;
 

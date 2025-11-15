@@ -22,9 +22,9 @@ public class PredictionServiceImpl implements IPredictionService {
     private OrderInfoMapper orderInfoMapper;
 
     @Override
-    public PredictionResult predictSales(Integer drugId, Integer days) {
+    public PredictionResult predictSales(Integer scenicId, Integer days) {
         // 获取历史销售数据（例如过去90天）
-        List<OrderItem> historicalSales = getHistoricalSalesData(drugId, 15);
+        List<OrderItem> historicalSales = getHistoricalSalesData(scenicId, 15);
 
         // 计算移动平均值
         double movingAverage = calculateMovingAverage(historicalSales, 7); // 7日移动平均

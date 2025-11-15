@@ -19,7 +19,7 @@
         FROM
         evaluation eva
         LEFT JOIN order_info oi ON (oi.id = eva.order_id)
-        LEFT JOIN user_info ui ON ( ui.id = oi.user_id )
+        LEFT JOIN user_info ui ON ( ui.id = eva.user_id )
         LEFT JOIN room_type rt ON ( rt.id = oi.type_id )
         LEFT JOIN hotel_info hi ON ( hi.id = oi.hotel_id )
         WHERE
@@ -31,7 +31,7 @@
             AND ui.name LIKE CONCAT('%',#{evaluation.userName},'%')
         </if>
         <if test="evaluation.userId != null">
-            AND hi.user_id = #{evaluation.userId}
+            AND ui.user_id = #{evaluation.userId}
         </if>
         <if test="evaluation.hotelName != null and evaluation.hotelName != ''">
             AND hi.name LIKE CONCAT('%',#{evaluation.hotelName},'%')
@@ -51,13 +51,13 @@
         eva.create_date AS createDate,
         oi.code,
         oi.price,
-        oi.day_num AS dayNum,
+        oi.amount,
         ui.name AS userName,
         ui.avatar,
-        si.name AS scenicName,
+        si.scenic_name AS scenicName
         FROM
         evaluation eva
-        LEFT JOIN order_info oi ON (oi.id = eva.order_id)
+        LEFT JOIN scenic_order oi ON (oi.id = eva.order_id)
         LEFT JOIN user_info ui ON ( ui.id = oi.user_id )
         LEFT JOIN scenic_info si ON ( si.id = oi.scenic_id )
         WHERE
@@ -72,7 +72,7 @@
             AND ui.user_id = #{evaluation.userId}
         </if>
         <if test="evaluation.hotelName != null and evaluation.hotelName != ''">
-            AND si.name LIKE CONCAT('%',#{evaluation.hotelName},'%')
+            AND si.scenic_name LIKE CONCAT('%',#{evaluation.hotelName},'%')
         </if>
         ORDER BY eva.create_date DESC
     </select>
@@ -83,17 +83,16 @@
         eva.id,
         eva.score,
         eva.content,
-        eva.scenic_id,
         eva.create_date AS createDate,
         oi.code,
         oi.price,
-        oi.day_num AS dayNum,
+        oi.amount,
         ui.name AS userName,
         ui.avatar,
-        si.name AS scenicName,
+        si.scenic_name AS scenicName
         FROM
         evaluation eva
-        LEFT JOIN order_info oi ON (oi.id = eva.order_id)
+        LEFT JOIN scenic_order oi ON (oi.id = eva.order_id)
         LEFT JOIN user_info ui ON ( ui.id = oi.user_id )
         LEFT JOIN scenic_info si ON ( si.id = oi.scenic_id )
         WHERE

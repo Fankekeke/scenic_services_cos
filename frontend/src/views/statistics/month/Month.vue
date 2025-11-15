@@ -19,7 +19,7 @@
         <a-col :span="12">
           <div hoverable :bordered="false" style="width: 100%;margin-top: 25px">
             <a-skeleton active v-if="chartLoading" />
-            <p v-if="!chartLoading" style="font-weight: 650;font-size: 15px;margin-bottom: 8px;font-family: SimHei">此月内入库量统计</p>
+            <p v-if="!chartLoading" style="font-weight: 650;font-size: 15px;margin-bottom: 8px;font-family: SimHei">此月内景点单量统计</p>
             <apexchart v-if="!chartLoading" type="radar" height="450" :options="chartOptions3" :series="series3"></apexchart>
           </div>
         </a-col>
@@ -28,7 +28,7 @@
             <a-col :span="12" style="margin-top: 70px">
               <a-card hoverable>
                 <a-row>
-                  <a-col :span="24" style="font-size: 13px;margin-bottom: 8px;font-family: SimHei">本月订单量</a-col>
+                  <a-col :span="24" style="font-size: 13px;margin-bottom: 8px;font-family: SimHei">本月景区订单量</a-col>
                   <a-col :span="4"><a-icon type="arrow-up" style="font-size: 30px;margin-top: 3px"/></a-col>
                   <a-col :span="18" style="font-size: 28px;font-weight: 500;font-family: SimHei">
                     {{ titleData.orderNum }}
@@ -40,11 +40,11 @@
             <a-col :span="12" style="margin-top: 70px">
               <a-card hoverable>
                 <a-row>
-                  <a-col :span="24" style="font-size: 13px;margin-bottom: 8px;font-family: SimHei">本月总收益</a-col>
+                  <a-col :span="24" style="font-size: 13px;margin-bottom: 8px;font-family: SimHei">本月景区总收益</a-col>
                   <a-col :span="4"><a-icon type="arrow-up" style="font-size: 30px;margin-top: 3px"/></a-col>
                   <a-col :span="18" style="font-size: 28px;font-weight: 500;font-family: SimHei">
                     {{ titleData.totalPrice }}
-                    <span style="font-size: 20px;margin-top: 3px">单</span>
+                    <span style="font-size: 20px;margin-top: 3px">元</span>
                   </a-col>
                 </a-row>
               </a-card>
@@ -52,7 +52,7 @@
             <a-col :span="12" style="margin-top: 70px">
               <a-card hoverable>
                 <a-row>
-                  <a-col :span="24" style="font-size: 13px;margin-bottom: 8px;font-family: SimHei">本月入库单量</a-col>
+                  <a-col :span="24" style="font-size: 13px;margin-bottom: 8px;font-family: SimHei">本月酒店订单量</a-col>
                   <a-col :span="4"><a-icon type="arrow-up" style="font-size: 30px;margin-top: 3px"/></a-col>
                   <a-col :span="18" style="font-size: 28px;font-weight: 500;font-family: SimHei">
                     {{ titleData.putNum }}
@@ -64,7 +64,7 @@
             <a-col :span="12" style="margin-top: 70px">
               <a-card hoverable>
                 <a-row>
-                  <a-col :span="24" style="font-size: 13px;margin-bottom: 8px;font-family: SimHei">本月总支出</a-col>
+                  <a-col :span="24" style="font-size: 13px;margin-bottom: 8px;font-family: SimHei">本月酒店总收益</a-col>
                   <a-col :span="4"><a-icon type="arrow-up" style="font-size: 30px;margin-top: 3px"/></a-col>
                   <a-col :span="18" style="font-size: 28px;font-weight: 500;font-family: SimHei">
                     {{ titleData.outlayPrice }}
@@ -76,21 +76,21 @@
           </a-row>
         </a-col>
         <a-col :span="24">
-          <a-col :span="8">
+          <a-col :span="12">
             <div hoverable :bordered="false" style="width: 100%">
               <a-skeleton active v-if="chartLoading" />
               <p v-if="!chartLoading" style="font-weight: 650;font-size: 15px;margin-bottom: 8px;font-family: SimHei">景点销量排行</p>
               <apexchart v-if="!chartLoading" type="pie" height="350" :options="chartOptions4" :series="series4"></apexchart>
             </div>
           </a-col>
-          <a-col :span="8">
-            <div hoverable :bordered="false" style="width: 100%">
-              <a-skeleton active v-if="chartLoading" />
-              <p v-if="!chartLoading" style="font-weight: 650;font-size: 15px;margin-bottom: 8px;font-family: SimHei">景点销售排行</p>
-              <apexchart v-if="!chartLoading" type="radialBar" height="350" :options="chartOptions5" :series="series5"></apexchart>
-            </div>
-          </a-col>
-          <a-col :span="8">
+<!--          <a-col :span="8">-->
+<!--            <div hoverable :bordered="false" style="width: 100%">-->
+<!--              <a-skeleton active v-if="chartLoading" />-->
+<!--              <p v-if="!chartLoading" style="font-weight: 650;font-size: 15px;margin-bottom: 8px;font-family: SimHei">景点销售排行</p>-->
+<!--              <apexchart v-if="!chartLoading" type="radialBar" height="350" :options="chartOptions5" :series="series5"></apexchart>-->
+<!--            </div>-->
+<!--          </a-col>-->
+          <a-col :span="12">
             <div hoverable :bordered="false" style="width: 100%">
               <a-skeleton active v-if="chartLoading" />
               <p v-if="!chartLoading" style="font-weight: 650;font-size: 15px;margin-bottom: 8px;font-family: SimHei">销售景点分类</p>
@@ -101,21 +101,21 @@
         <a-col :span="24">
           <a-card hoverable :bordered="false" style="width: 100%">
             <a-skeleton active v-if="chartLoading" />
-            <p v-if="!chartLoading" style="font-weight: 650;font-size: 15px;margin-bottom: 8px;font-family: SimHei">此月内订单收益统计</p>
+            <p v-if="!chartLoading" style="font-weight: 650;font-size: 15px;margin-bottom: 8px;font-family: SimHei">此月内景点订单收益统计</p>
             <apexchart v-if="!chartLoading" type="line" height="350" :options="chartOptions" :series="series"></apexchart>
           </a-card>
         </a-col>
         <a-col :span="24">
           <a-card hoverable :bordered="false" style="width: 100%">
             <a-skeleton active v-if="chartLoading" />
-            <p v-if="!chartLoading" style="font-weight: 650;font-size: 15px;margin-bottom: 8px;font-family: SimHei">此月内订单量统计</p>
+            <p v-if="!chartLoading" style="font-weight: 650;font-size: 15px;margin-bottom: 8px;font-family: SimHei">此月内景点订单量统计</p>
             <apexchart v-if="!chartLoading" type="area" height="350" :options="chartOptions1" :series="series1"></apexchart>
           </a-card>
         </a-col>
         <a-col :span="24">
           <a-card hoverable :bordered="false" style="width: 100%">
             <a-skeleton active v-if="chartLoading" />
-            <p v-if="!chartLoading" style="font-weight: 650;font-size: 15px;margin-bottom: 8px;font-family: SimHei">此月内入库成本统计</p>
+            <p v-if="!chartLoading" style="font-weight: 650;font-size: 15px;margin-bottom: 8px;font-family: SimHei">此月内酒店单量统计</p>
             <apexchart v-if="!chartLoading" type="bar" height="350" :options="chartOptions2" :series="series2"></apexchart>
           </a-card>
         </a-col>
@@ -388,7 +388,7 @@ export default {
     },
     selectRate () {
       this.chartLoading = true
-      this.$get(`/cos/order-info/statistics/month`, {
+      this.$get(`/cos/scenic-order/statistics/month`, {
         date: moment(this.queryDate).format('YYYY-MM')
       }).then((r) => {
         this.titleData.orderNum = r.data.orderNum
@@ -414,13 +414,14 @@ export default {
           this.chartOptions4.labels.push(key)
         }
 
-        this.series5 = []
-        this.chartOptions5.labels = []
-        let saleRank = r.data.saleRank
-        saleRank.forEach(item => {
-          this.series5.push(item.num)
-          this.chartOptions5.labels.push(item.name)
-        })
+        // this.series5 = []
+        // this.chartOptions5.labels = []
+        // let saleRank = r.data.saleRank
+        // saleRank.forEach(item => {
+        //   this.series5.push(item.num)
+        //   this.chartOptions5.labels.push(item.name)
+        // })
+        console.log(this.chartOptions5.labels)
 
         this.series6 = []
         this.chartOptions6.labels = []

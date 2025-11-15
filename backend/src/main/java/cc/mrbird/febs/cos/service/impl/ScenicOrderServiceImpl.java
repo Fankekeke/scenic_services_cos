@@ -57,14 +57,15 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
         }
         Map<Integer, List<ScenicOrder>> orderMap = scenicOrderList.stream().collect(Collectors.groupingBy(ScenicOrder::getScenicId));
         List<ScenicInfo> scenicInfoList = scenicInfoMapper.selectList(new LambdaQueryWrapper<ScenicInfo>().in(ScenicInfo::getId, orderMap.keySet()));
-        Map<Integer, String> infoMap = scenicInfoList.stream().collect(Collectors.toMap(ScenicInfo::getId, ScenicInfo::getScenicName));
+        Map<Integer, ScenicInfo> infoMap = scenicInfoList.stream().collect(Collectors.toMap(ScenicInfo::getId, e -> e));
         // 统计票数与价格
         List<LinkedHashMap<String, Object>> result = new ArrayList<>();
         for (Map.Entry<Integer, List<ScenicOrder>> entry : orderMap.entrySet()) {
             LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>() {
                 {
-                    put("scenicName", infoMap.get(entry.getKey()));
-                    put("amount", entry.getValue().size());
+                    put("scenicName", infoMap.get(entry.getKey()).getScenicName());
+                    put("scenicImages", infoMap.get(entry.getKey()).getWebImg());
+                    put("amount", entry.getValue().stream().map(ScenicOrder::getAmount).reduce(0, Integer::sum));
                     put("price", entry.getValue().stream().map(ScenicOrder::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
                 }
             };
@@ -103,14 +104,10 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
         }
         Map<Integer, List<OrderInfo>> orderPutMonthMap = hotelOrderList.stream().collect(Collectors.groupingBy(OrderInfo::getMonth));
 
-        // 本年订单量
         result.put("orderNum", scenicOrderList.size());
-        // 本年总收益
         BigDecimal totalPrice = scenicOrderList.stream().map(ScenicOrder::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
         result.put("totalPrice", totalPrice);
-        // 本年入库单量
         result.put("putNum", hotelOrderList.size());
-        // 本年总支出
         BigDecimal outlayPrice = hotelOrderList.stream().map(OrderInfo::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
         result.put("outlayPrice", outlayPrice);
 
@@ -120,7 +117,6 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
         List<BigDecimal> outlayPriceList = new ArrayList<>();
         for (int i = 1; i <= 12; i++) {
 
-            // 本月出库
             List<ScenicOrder> currentMonthOutList = orderOutMonthMap.get(i);
             if (CollectionUtil.isEmpty(currentMonthOutList)) {
                 orderNumList.add(0);
@@ -131,7 +127,6 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
                 orderPriceList.add(currentMonthOutPrice);
             }
 
-            // 本月入库
             List<OrderInfo> currentMonthPutList = orderPutMonthMap.get(i);
             if (CollectionUtil.isEmpty(currentMonthPutList)) {
                 outlayNumList.add(0);
@@ -143,14 +138,11 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
             }
 
         }
-        // 12月内订单收益统计
         result.put("orderPriceList", orderPriceList);
-        // 12月内订单量统计
         result.put("orderNumList", orderNumList);
-        // 12月内入库成本统计
         result.put("outlayPriceList", outlayPriceList);
-        // 12月内入库量统计
-        result.put("outlayNumList", outlayNumList);
+        result.put("outlayNumList", orderNumList);
+//        result.put("outlayNumList", outlayNumList);
 
         // 景点销量排行
         List<LinkedHashMap<String, Object>> saleRank = new ArrayList<>();
@@ -232,9 +224,7 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
         // 本月总收益
         BigDecimal totalPrice = scenicOrderList.stream().map(ScenicOrder::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
         result.put("totalPrice", totalPrice);
-        // 本月入库单量
         result.put("putNum", hotelOrderList.size());
-        // 本月总支出
         BigDecimal outlayPrice = hotelOrderList.stream().map(OrderInfo::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
         result.put("outlayPrice", outlayPrice);
 
@@ -249,7 +239,6 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
 
         for (int i = 1; i <= days; i++) {
             dateTimeList.add(month + "月" + i + "日");
-            // 本天出库
             List<ScenicOrder> currentDayOutList = orderOutDayMap.get(i);
             if (CollectionUtil.isEmpty(currentDayOutList)) {
                 orderNumList.add(0);
@@ -272,14 +261,11 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
             }
 
         }
-        // 本月内订单收益统计
         result.put("orderPriceList", orderPriceList);
-        // 本月内订单量统计
         result.put("orderNumList", orderNumList);
-        // 本月内入库成本统计
         result.put("outlayPriceList", outlayPriceList);
-        // 本月内入库量统计
-        result.put("outlayNumList", outlayNumList);
+        result.put("outlayNumList", orderNumList);
+//        result.put("outlayNumList", outlayNumList);
 
         result.put("dateList", dateTimeList);
         // 景点销量排行

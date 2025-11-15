@@ -178,10 +178,10 @@ public class CacheServiceImpl implements CacheService {
         for (ScenicInfo scenicInfo : scenicInfoList) {
             String pointStr = scenicInfo.getPoint();
             if (StrUtil.isNotBlank(pointStr)) {
-                String[] coords = StrUtil.split(pointStr, ",");
-                if (coords.length >= 2) {
-                    double longitude = Double.parseDouble(coords[0]);
-                    double latitude = Double.parseDouble(coords[1]);
+                List<String> coords = StrUtil.split(pointStr, ",");
+                if (coords.size() >= 2) {
+                    double longitude = Double.parseDouble(coords.get(0));
+                    double latitude = Double.parseDouble(coords.get(1));
                     points.put(scenicInfo.getId().toString(), new Point(longitude, latitude));
                 }
             }

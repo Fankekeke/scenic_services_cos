@@ -7,7 +7,7 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label='民宿名称'
+                label='酒店名称'
                 :labelCol="{span: 4}"
                 :wrapperCol="{span: 18, offset: 2}">
                 <a-input v-model="queryParams.name"/>
@@ -143,7 +143,7 @@ export default {
     }),
     columns () {
       return [{
-        title: '民宿名称',
+        title: '酒店名称',
         dataIndex: 'name',
         scopedSlots: { customRender: 'nameShow' }
       }, {

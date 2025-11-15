@@ -287,7 +287,7 @@ export default {
         params.size = this.pagination.defaultPageSize
         params.current = this.pagination.defaultCurrent
       }
-      this.$get('/cos/evaluation/page', {
+      this.$get('/cos/evaluation/hotel/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

@@ -7,37 +7,18 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="房间名称"
-                :labelCol="{span: 4}"
-                :wrapperCol="{span: 18, offset: 2}">
-                <a-input v-model="queryParams.roomName"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item
-                label="订单编号"
-                :labelCol="{span: 4}"
-                :wrapperCol="{span: 18, offset: 2}">
-                <a-input v-model="queryParams.code"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item
-                label="入住人"
-                :labelCol="{span: 4}"
-                :wrapperCol="{span: 18, offset: 2}">
+                label="评价人"
+                :labelCol="{span: 6}"
+                :wrapperCol="{span: 16, offset: 2}">
                 <a-input v-model="queryParams.userName"/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="订单状态"
-                :labelCol="{span: 4}"
-                :wrapperCol="{span: 18, offset: 2}">
-                <a-select v-model="queryParams.orderStatus" allowClear>
-                  <a-select-option value="0">未入住</a-select-option>
-                  <a-select-option value="1">已入住</a-select-option>
-                </a-select>
+                label="景点名称"
+                :labelCol="{span: 6}"
+                :wrapperCol="{span: 16, offset: 2}">
+                <a-input v-model="queryParams.hotelName"/>
               </a-form-item>
             </a-col>
           </div>
@@ -51,7 +32,6 @@
     <div>
       <div class="operator">
         <a-button @click="batchDelete">删除</a-button>
-        <a-button type="primary" ghost @click="downLoad">导出</a-button>
       </div>
       <!-- 表格区域 -->
       <a-table ref="TableInfo"
@@ -63,14 +43,13 @@
                :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
                :scroll="{ x: 900 }"
                @change="handleTableChange">
-        <template slot="titleShow" slot-scope="text, record">
+        <template slot="addressShow" slot-scope="text, record">
           <template>
-            <a-badge status="processing"/>
             <a-tooltip>
               <template slot="title">
-                {{ record.title }}
+                {{ record.address }}
               </template>
-              {{ record.title.slice(0, 8) }} ...
+              {{ record.address.slice(0, 10) }} ...
             </a-tooltip>
           </template>
         </template>
@@ -85,36 +64,26 @@
           </template>
         </template>
         <template slot="operation" slot-scope="text, record">
-          <a-icon type="cloud" theme="twoTone" twoToneColor="#4a9ff5" @click="view(record)" title="查 看"></a-icon>
+          <a-icon type="reconciliation" @click="view(record)" title="查 看" style="margin-right: 10px"></a-icon>
+          <a-icon type="edit" @click="edit(record)" title="修 改"></a-icon>
         </template>
       </a-table>
     </div>
-    <order-view
-      @close="handleorderViewClose"
-      :orderShow="orderView.visiable"
-      :orderData="orderView.data">
-    </order-view>
   </a-card>
 </template>
 
 <script>
 import RangeDate from '@/components/datetime/RangeDate'
-import OrderView from './OrderView'
 import {mapState} from 'vuex'
 import moment from 'moment'
-import { newSpread, floatForm, floatReset, saveExcel } from '@/utils/spreadJS'
 moment.locale('zh-cn')
 
 export default {
-  name: 'order',
-  components: {OrderView, RangeDate},
+  name: 'Post',
+  components: {RangeDate},
   data () {
     return {
       advanced: false,
-      orderView: {
-        visiable: false,
-        data: null
-      },
       queryParams: {},
       filteredInfo: null,
       sortedInfo: null,
@@ -139,20 +108,7 @@ export default {
     }),
     columns () {
       return [{
-        title: '订单所属',
-        dataIndex: 'hotelName',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return '《' + text + '》'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '订单编号',
-        dataIndex: 'code'
-      }, {
-        title: '用户名称',
+        title: '评价人',
         dataIndex: 'userName'
       }, {
         title: '头像',
@@ -161,24 +117,14 @@ export default {
           if (!record.avatar) return <a-avatar shape="square" icon="user" />
           return <a-popover>
             <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ record.avatar } />
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.avatar } />
             </template>
-            <a-avatar shape="square" icon="user" src={ record.avatar } />
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.avatar } />
           </a-popover>
         }
       }, {
-        title: '价格',
-        dataIndex: 'price',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '元'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '房间名称',
-        dataIndex: 'name',
+        title: '景点名称',
+        dataIndex: 'scenicName',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -187,30 +133,21 @@ export default {
           }
         }
       }, {
-        title: '入住天数',
-        dataIndex: 'dayNum',
+        title: '评价分数',
+        dataIndex: 'score',
         customRender: (text, row, index) => {
           if (text !== null) {
-            return text + '天'
+            return text + ' 分'
           } else {
             return '- -'
           }
         }
       }, {
-        title: '当前状态',
-        dataIndex: 'orderStatus',
-        customRender: (text, row, index) => {
-          switch (text) {
-            case 0:
-              return <a-tag color="pink">未入住</a-tag>
-            case 1:
-              return <a-tag color="green">已入住</a-tag>
-            default:
-              return '- -'
-          }
-        }
+        title: '评价内容',
+        dataIndex: 'content',
+        scopedSlots: { customRender: 'contentShow' }
       }, {
-        title: '下单时间',
+        title: '评价日期',
         dataIndex: 'createDate',
         customRender: (text, row, index) => {
           if (text !== null) {
@@ -219,10 +156,6 @@ export default {
             return '- -'
           }
         }
-      }, {
-        title: '操作',
-        dataIndex: 'operation',
-        scopedSlots: {customRender: 'operation'}
       }]
     }
   },
@@ -230,32 +163,14 @@ export default {
     this.fetch()
   },
   methods: {
-    downLoad () {
-      this.$message.loading('正在生成', 0)
-      this.$get('/cos/order-info/page', { size: 9999, current: 1 }).then((r) => {
-        let newData = []
-        r.data.data.records.forEach((item, index) => {
-          newData.push([(index + 1).toFixed(0), item.hotelName, item.code, item.userName, item.price, item.name, item.dayNum, item.orderStatus === 0 ? '未入住' : '已入住', item.createDate])
-        })
-        let spread = newSpread('order2')
-        spread = floatForm(spread, 'order2', newData)
-        saveExcel(spread, '酒店订单.xlsx')
-        floatReset(spread, 'order2', newData.length)
-        this.$message.destroy()
-      })
-    },
-    view (row) {
-      this.orderView.data = row
-      this.orderView.visiable = true
-    },
-    handleorderViewClose () {
-      this.orderView.visiable = false
-    },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
     toggleAdvanced () {
       this.advanced = !this.advanced
+    },
+    handleDeptChange (value) {
+      this.queryParams.deptId = value || ''
     },
     batchDelete () {
       if (!this.selectedRowKeys.length) {
@@ -269,7 +184,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/order-info/' + ids).then(() => {
+          that.$delete('/cos/evaluation/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -339,10 +254,8 @@ export default {
         params.size = this.pagination.defaultPageSize
         params.current = this.pagination.defaultCurrent
       }
-      if (params.orderStatus === undefined) {
-        delete params.orderStatus
-      }
-      this.$get('/cos/order-info/page', {
+      params.userId = this.currentUser.userId
+      this.$get('/cos/evaluation/scenic/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

@@ -65,5 +65,5 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
      * @param endDate
      * @return
      */
-    List<OrderItem> getHistoricalSalesByDrugId(@Param("scenicId") Integer scenicId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    List<OrderItem> getHistoricalSalesByDrugId(@Param("scenicId") Integer scenicId, @Param("startTime") LocalDateTime startDate, @Param("endTime") LocalDateTime endDate);
 }

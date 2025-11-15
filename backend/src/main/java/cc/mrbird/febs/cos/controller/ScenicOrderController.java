@@ -2,6 +2,7 @@ package cc.mrbird.febs.cos.controller;
 
 
 import cc.mrbird.febs.common.utils.R;
+import cc.mrbird.febs.cos.entity.ScenicInfo;
 import cc.mrbird.febs.cos.entity.ScenicOrder;
 import cc.mrbird.febs.cos.entity.UserInfo;
 import cc.mrbird.febs.cos.service.IScenicInfoService;
@@ -20,6 +21,8 @@ import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -33,6 +36,8 @@ public class ScenicOrderController {
     private final IScenicOrderService scenicOrderService;
 
     private final IUserInfoService userInfoService;
+
+    private final IScenicInfoService scenicInfoService;
 
     /**
      * 分页查询景点订单
@@ -59,6 +64,29 @@ public class ScenicOrderController {
     @GetMapping("/queryScenicTop")
     public R queryScenicTop(@RequestParam String date) {
         return R.ok(scenicOrderService.queryScenicTop(date));
+    }
+
+    /**
+     * 查询景点列表占比
+     *
+     * @return
+     */
+    @GetMapping("/queryScenicListRate")
+    public R queryScenicListRate() {
+        List<ScenicInfo> scenicInfoList = scenicInfoService.list();
+        List<LinkedHashMap<String, Object>> result = new ArrayList<>();
+        for (ScenicInfo scenicInfo : scenicInfoList) {
+            String numberStr = scenicInfo.getHot().replaceAll("[^\\d.]", ""); // "0.82"
+            double hotValue = Double.parseDouble(numberStr); // 0.82
+            result.add(new LinkedHashMap<String, Object>() {
+                {
+                    put("name", scenicInfo.getScenicName());
+                    put("point", scenicInfo.getPoint());
+                    put("hot", hotValue);
+                }
+            });
+        }
+        return R.ok(result);
     }
 
     /**

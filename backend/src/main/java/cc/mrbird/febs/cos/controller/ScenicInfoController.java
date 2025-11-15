@@ -33,6 +33,20 @@ public class ScenicInfoController {
     private RedisTemplate redisTemplate;
 
     /**
+     * 查询景点信息
+     *
+     * @param key 关键字
+     * @return 结果
+     */
+    @GetMapping("/queryScenicInfoByKey")
+    public R queryScenicInfoByKey(@RequestParam(value = "key", required = false, defaultValue = "拉卜楞寺") String key) {
+        List<ScenicInfo> scenicInfos = scenicInfoService.list(Wrappers.<ScenicInfo>lambdaQuery()
+            .like(ScenicInfo::getScenicName, key)
+            .last("LIMIT 10"));
+        return R.ok(scenicInfos);
+    }
+
+    /**
      * 查询附近的景点
      *
      * @param lat

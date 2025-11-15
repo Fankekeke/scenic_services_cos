@@ -14,6 +14,78 @@
         <a-col :span="8" style="height: 100%;">
           <div id="areas" style="width: 100%;height: 100%;background:#ec9e3c;color:#fff"></div>
         </a-col>
+        <a-col :span="8">
+          <a-row style="padding-left: 24px; padding-right: 24px; background: #f8f9fa; padding: 20px;">
+            <a-col style="margin-bottom: 15px">
+              <span style="font-size: 18px; font-weight: 600; color: #000c17; border-left: 4px solid #1890ff; padding-left: 10px;">未来天气预报</span>
+            </a-col>
+            <a-col :span="24" v-if="weatherData && weatherData.data && weatherData.data.forecast">
+              <div style="max-height: 400px; overflow-y: auto;">
+                <div
+                  v-for="(item, index) in weatherData.data.forecast"
+                  :key="index"      style="display: flex; align-items: center; padding: 12px 10px; border-bottom: 1px solid #eee; background: white; margin-bottom: 8px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);"
+                >
+                  <div style="flex: 1; text-align: center;">
+                    <div style="font-size: 14px; font-weight: 500;">{{ item.ymd }}</div>
+                    <div style="font-size: 12px; color: #666; margin-top: 3px;">{{ item.week }}</div>
+                  </div>
+                  <div style="flex: 1; text-align: center;">
+                    <div style="font-size: 14px;">{{ item.type }}</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 3px;">{{ item.notice }}</div>
+                  </div>
+                  <div style="flex: 1; text-align: center;">
+                    <div style="font-size: 14px; color: #1890ff;">
+                      {{ item.low.replace('低温 ', '') }}~{{ item.high.replace('高温 ', '') }}°C
+                    </div>
+                    <div style="font-size: 12px; color: #999; margin-top: 3px;">
+                      {{ item.fx }} {{ item.fl }}
+                    </div>
+                  </div>
+                  <div style="flex: 0.8; text-align: center;">
+                    <div style="font-size: 14px; font-weight: 500;">
+                      {{ item.aqi }}
+                    </div>
+                    <div style="font-size: 12px; color: #999; margin-top: 3px;">AQI</div>
+                  </div>
+                </div>
+              </div>
+            </a-col>
+          </a-row>
+          <a-row style="padding-left: 24px; padding-right: 24px; background: #f8f9fa; padding: 20px;margin-top: 25px">
+            <a-col style="margin-bottom: 15px">
+              <span style="font-size: 18px; font-weight: 600; color: #000c17; border-left: 4px solid #1890ff; padding-left: 10px;">景点介绍</span>
+            </a-col>
+            <a-col :span="24">
+              <a-spin :spinning="aiLoading" tip="AI分析中..." class="ai-spin">
+                <div v-if="aiAnalysisResult" class="ai-content">
+                  <a-alert type="info" show-icon class="ai-result-alert">
+                    <template slot="message">
+                      <div v-html="formatAiResult(aiAnalysisResult)" class="ai-result-content"></div>
+                      <div style="text-align: right; margin-top: 10px;">
+                        <a-button
+                          type="primary"
+                          shape="circle"
+                          :icon="isPlaying ? 'pause' : 'sound'"
+                          @click="toggleSpeech"
+                          :loading="speechLoading"
+                          size="small"
+                        >
+                        </a-button>
+                      </div>
+                    </template>
+                  </a-alert>
+                </div>
+                <div v-else class="ai-placeholder">
+                  <a-empty description="暂无AI分析结果" class="ai-empty">
+                    <a-button type="primary" @click="queryAiContent" :loading="aiLoading" class="ai-generate-btn">
+                      <a-icon type="thunderbolt" /> 生成AI介绍
+                    </a-button>
+                  </a-empty>
+                </div>
+              </a-spin>
+            </a-col>
+          </a-row>
+        </a-col>
         <a-col :span="8" style="height: 100vh;color: black;overflow: auto">
           <div style="font-size: 13px" v-if="scenicData !== null">
             <a-carousel autoplay style="height: 250px;" v-if="scenicData.webImg !== undefined && scenicData.webImg !== ''">
@@ -116,78 +188,6 @@
               </a-col>
             </a-row>
           </div>
-        </a-col>
-        <a-col :span="8">
-          <a-row style="padding-left: 24px; padding-right: 24px; background: #f8f9fa; padding: 20px;">
-            <a-col style="margin-bottom: 15px">
-              <span style="font-size: 18px; font-weight: 600; color: #000c17; border-left: 4px solid #1890ff; padding-left: 10px;">未来天气预报</span>
-            </a-col>
-            <a-col :span="24" v-if="weatherData && weatherData.data && weatherData.data.forecast">
-              <div style="max-height: 400px; overflow-y: auto;">
-                <div
-                  v-for="(item, index) in weatherData.data.forecast"
-                  :key="index"      style="display: flex; align-items: center; padding: 12px 10px; border-bottom: 1px solid #eee; background: white; margin-bottom: 8px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);"
-                >
-                  <div style="flex: 1; text-align: center;">
-                    <div style="font-size: 14px; font-weight: 500;">{{ item.ymd }}</div>
-                    <div style="font-size: 12px; color: #666; margin-top: 3px;">{{ item.week }}</div>
-                  </div>
-                  <div style="flex: 1; text-align: center;">
-                    <div style="font-size: 14px;">{{ item.type }}</div>
-                    <div style="font-size: 12px; color: #999; margin-top: 3px;">{{ item.notice }}</div>
-                  </div>
-                  <div style="flex: 1; text-align: center;">
-                    <div style="font-size: 14px; color: #1890ff;">
-                      {{ item.low.replace('低温 ', '') }}~{{ item.high.replace('高温 ', '') }}°C
-                    </div>
-                    <div style="font-size: 12px; color: #999; margin-top: 3px;">
-                      {{ item.fx }} {{ item.fl }}
-                    </div>
-                  </div>
-                  <div style="flex: 0.8; text-align: center;">
-                    <div style="font-size: 14px; font-weight: 500;">
-                      {{ item.aqi }}
-                    </div>
-                    <div style="font-size: 12px; color: #999; margin-top: 3px;">AQI</div>
-                  </div>
-                </div>
-              </div>
-            </a-col>
-          </a-row>
-          <a-row style="padding-left: 24px; padding-right: 24px; background: #f8f9fa; padding: 20px;margin-top: 25px">
-            <a-col style="margin-bottom: 15px">
-              <span style="font-size: 18px; font-weight: 600; color: #000c17; border-left: 4px solid #1890ff; padding-left: 10px;">景点介绍</span>
-            </a-col>
-            <a-col :span="24">
-              <a-spin :spinning="aiLoading" tip="AI分析中..." class="ai-spin">
-                <div v-if="aiAnalysisResult" class="ai-content">
-                  <a-alert type="info" show-icon class="ai-result-alert">
-                    <template slot="message">
-                      <div v-html="formatAiResult(aiAnalysisResult)" class="ai-result-content"></div>
-                      <div style="text-align: right; margin-top: 10px;">
-                        <a-button
-                          type="primary"
-                          shape="circle"
-                          :icon="isPlaying ? 'pause' : 'sound'"
-                          @click="toggleSpeech"
-                          :loading="speechLoading"
-                          size="small"
-                        >
-                        </a-button>
-                      </div>
-                    </template>
-                  </a-alert>
-                </div>
-                <div v-else class="ai-placeholder">
-                  <a-empty description="暂无AI分析结果" class="ai-empty">
-                    <a-button type="primary" @click="queryAiContent" :loading="aiLoading" class="ai-generate-btn">
-                      <a-icon type="thunderbolt" /> 生成AI介绍
-                    </a-button>
-                  </a-empty>
-                </div>
-              </a-spin>
-            </a-col>
-          </a-row>
         </a-col>
       </a-row>
     </div>
