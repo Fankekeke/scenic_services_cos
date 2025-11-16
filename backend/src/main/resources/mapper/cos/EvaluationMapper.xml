@@ -33,6 +33,9 @@
         <if test="evaluation.userId != null">
             AND ui.user_id = #{evaluation.userId}
         </if>
+        <if test="evaluation.hotelId != null">
+            AND hi.user_id = #{evaluation.hotelId}
+        </if>
         <if test="evaluation.hotelName != null and evaluation.hotelName != ''">
             AND hi.name LIKE CONCAT('%',#{evaluation.hotelName},'%')
         </if>
@@ -96,7 +99,7 @@
         LEFT JOIN user_info ui ON ( ui.id = oi.user_id )
         LEFT JOIN scenic_info si ON ( si.id = oi.scenic_id )
         WHERE
-        1 = 1 AND eva.type = 2
+        1 = 1 AND eva.type = 1
         <if test="scenicId != null and scenicId != ''">
             AND eva.scenic_id = #{scenicId}
         </if>
@@ -104,10 +107,11 @@
     </select>
 
     <!-- 获取房间评价 -->
-    <select id="getEvaluationByRoomType" resultType="java.util.LinkedHashMap">
+    <select id="getEvaluationByHotel" resultType="java.util.LinkedHashMap">
         SELECT
         eva.content,
         eva.create_date,
+        eva.score,
         ui.avatar,
         ui.name
         FROM
@@ -115,6 +119,7 @@
         LEFT JOIN order_info oi ON ( oi.id = eva.order_id )
         LEFT JOIN user_info ui ON ( ui.id = eva.user_id )
         WHERE
-        oi.type_id = #{ roomTypeId }
+            1 = 1 AND eva.type = 2
+        AND oi.hotel_id = #{hotelId}
     </select>
 </mapper>

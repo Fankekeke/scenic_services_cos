@@ -1,6 +1,16 @@
 <template>
   <div class="scenic-top-container">
     <a-card title="景区销量排行榜" :bordered="false" class="ranking-card">
+      <!-- Add month selector -->
+      <div class="month-selector" style="margin-top: 20px;text-align: right">
+        <a-month-picker
+          v-model="selectedMonth"
+          placeholder="选择月份"
+          format="YYYY-MM"
+          @change="onMonthChange"          style="width: 200px;"
+        />
+      </div>
+
       <div class="ranking-list">
         <div
           v-for="(item, index) in scenicRanking"
@@ -31,11 +41,14 @@
 </template>
 
 <script>
+import moment from 'moment'
+moment.locale('zh-cn')
 export default {
   name: 'scenicTop',
   data () {
     return {
-      scenicRanking: []
+      scenicRanking: [],
+      selectedMonth: moment()
     }
   },
   mounted () {
@@ -44,10 +57,15 @@ export default {
   methods: {
     queryScenicTop () {
       this.$get('/cos/scenic-order/queryScenicTop', {
-        date: '2025-11'
+        date: moment(this.selectedMonth).format('YYYY-MM')
       }).then((r) => {
         this.scenicRanking = r.data.data
       })
+    },
+    onMonthChange (date, dateString) {
+      // date 是 moment 对象，dateString 是格式化后的字符串
+      this.selectedMonth = date || moment() // 如果清空选择则使用当前月份
+      this.queryScenicTop()
     }
   }
 }
@@ -152,5 +170,9 @@ export default {
   color: #ff4d4f;
   font-size: 16px;
   font-weight: 500;
+}
+
+.month-selector {
+  margin-bottom: 20px;
 }
 </style>

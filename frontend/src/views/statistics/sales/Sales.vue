@@ -34,18 +34,18 @@
           <a-col :span="24">
             <div class="detail-item">
               <!--              <span class="detail-label">模型置信度</span>-->
-              <span
-                :class="[
-            'detail-value',
-            {
-              'confidence-high': predictionData.confidence > 0.8,
-              'confidence-medium': predictionData.confidence > 0.6 && predictionData.confidence <= 0.8,
-              'confidence-low': predictionData.confidence <= 0.6
-            }
-          ]"
-              >
-          {{ (predictionData.confidence * 100).toFixed(2) }}%
-        </span>
+<!--              <span-->
+<!--                :class="[-->
+<!--            'detail-value',-->
+<!--            {-->
+<!--              'confidence-high': predictionData.confidence > 0.8,-->
+<!--              'confidence-medium': predictionData.confidence > 0.6 && predictionData.confidence <= 0.8,-->
+<!--              'confidence-low': predictionData.confidence <= 0.6-->
+<!--            }-->
+<!--          ]"-->
+<!--              >-->
+<!--          {{ (predictionData.confidence * 100).toFixed(2) }}%-->
+<!--        </span>-->
             </div>
           </a-col>
           <a-col :span="24">
@@ -75,7 +75,7 @@ import * as echarts from 'echarts'
 
 export default {
   name: 'Sales',
-  data() {
+  data () {
     return {
       selectedDrugId: null,
       drugList: [],
@@ -88,11 +88,11 @@ export default {
       searchTimeout: null
     }
   },
-  mounted() {
+  mounted () {
     this.initChart() // 先初始化图表
   },
   methods: {
-    handleSearch(value) {
+    handleSearch (value) {
       if (this.searchTimeout) {
         clearTimeout(this.searchTimeout)
       }
@@ -102,7 +102,7 @@ export default {
       }, 300)
     },
 
-    fetchDrugsByKeyword(keyword) {
+    fetchDrugsByKeyword (keyword) {
       if (!keyword) {
         // If no keyword, show all drugs
         this.filteredDrugOptions = [...this.drugList]
@@ -120,26 +120,26 @@ export default {
           this.searchLoading = false
         })
     },
-    getScenicList() {
+    getScenicList () {
       this.$get('/cos/scenic-info/queryScenicInfoByKey'
       ).then((r) => {
         this.drugList = r.data.data
       })
     },
-    getDrugSales(drugId = 1) {
+    getDrugSales (drugId = 1) {
       this.$get('/cos/prediction/sales', {scenicId: drugId}).then((r) => {
         this.predictionData = r.data.data
         this.dataList = r.data.data
         this.updateChart()
       })
     },
-    onDrugChange(value) {
+    onDrugChange (value) {
       this.$get('/cos/prediction/sales', {scenicId: value}).then((r) => {
         this.predictionData = r.data.data
         this.updateChart()
       })
     },
-    initChart() {
+    initChart () {
       this.chartOptions = {
         chart: {
           type: 'line',
@@ -173,7 +173,7 @@ export default {
         data: []
       }]
     },
-    updateChart() {
+    updateChart () {
       if (!this.predictionData) return
 
       // 更新 x 轴数据

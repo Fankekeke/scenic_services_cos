@@ -1,6 +1,6 @@
 
 <template>
-  <div class="chat-container" style="margin-top: 15px">
+  <div class="chat-container">
     <!-- 左侧联系人列表 -->
     <div class="contacts-panel">
       <div class="panel-header">
@@ -94,32 +94,31 @@ export default {
   },
   methods: {
     queryContacts () {
-      this.$get(`/cos/chat-record/contacts/user/${this.currentUser.userId}`).then((r) => {
+      this.$get(`/cos/chat-record/contacts/hotel/${this.currentUser.userId}`).then((r) => {
         this.contacts = r.data.data.map(contact => ({
           id: contact.hotelId,
-          userId: contact.userId,
-          name: contact.hotelName,
-          avatar: 'http://127.0.0.1:9527/imagesWeb/' + contact.hotelImage.split(',')[0],
+          studentId: contact.userId,
+          name: contact.userName,
+          avatar: 'http://127.0.0.1:9527/imagesWeb/' + contact.userImages,
           lastMessage: contact.lastMessage,
           status: 'online'
         }))
       })
     },
     selectContact (contact) {
-      console.log(contact)
       this.currentContact = contact
       // 这里可以加载与该联系人的历史消息
-      this.loadMessages(contact.id, contact.userId)
+      this.loadMessages(contact.id, contact.studentId)
     },
-    loadMessages (hotelId, userId) {
+    loadMessages (teacherId, studentId) {
       this.$get(`/cos/chat-record/list`, {
-        userId: userId,
-        hotelId: hotelId
+        userId: studentId,
+        hotelId: teacherId
       }).then((r) => {
         // 将后端返回的聊天记录转换为前端需要的格式
         this.messages = r.data.data.map(message => ({
           id: message.id,
-          sender: message.senderType === '0' ? 'me' : message.hotelId.toString(),
+          sender: message.senderType === '1' ? 'me' : message.hotelId.toString(),
           content: message.content,
           timestamp: new Date(message.createTime)
         }))
@@ -132,13 +131,14 @@ export default {
           }
         })
       })
+      console.log('Loading messages for contact:', teacherId)
     },
     sendMsg (teacherId, studentId) {
       if (this.newMessage.trim() === '') return
       this.$post('/cos/chat-record', {
         hotelId: teacherId,
         userId: studentId,
-        senderType: 0,
+        senderType: 1,
         content: this.newMessage
       }).then((r) => {
 
@@ -159,7 +159,7 @@ export default {
       this.updateLastMessage(this.currentContact.id, this.newMessage)
       console.log(this.currentContact)
       // 发送消息到服务器
-      this.sendMsg(this.currentContact.id, this.currentContact.userId)
+      this.sendMsg(this.currentContact.id, this.currentContact.studentId)
 
       // 清空输入框
       this.newMessage = ''

@@ -73,6 +73,17 @@ public class EvaluationController {
     }
 
     /**
+     * 查询用户评价信息
+     *
+     * @param hotelId 景区ID
+     * @return 结果
+     */
+    @GetMapping("/queryEvaluateByHotelId")
+    public R queryEvaluateByHotelId(Integer hotelId) {
+        return R.ok(evaluationService.getEvaluationByHotel(hotelId));
+    }
+
+    /**
      * 添加评价信息
      *
      * @param evaluation

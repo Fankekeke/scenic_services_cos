@@ -3,13 +3,19 @@ package cc.mrbird.febs.cos.controller;
 
 import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.ChatRecord;
+import cc.mrbird.febs.cos.entity.HotelInfo;
+import cc.mrbird.febs.cos.entity.UserInfo;
 import cc.mrbird.febs.cos.service.IChatRecordService;
+import cc.mrbird.febs.cos.service.IHotelInfoService;
+import cc.mrbird.febs.cos.service.IUserInfoService;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,6 +27,10 @@ import java.util.List;
 public class ChatRecordController {
 
     private final IChatRecordService chatRecordService;
+
+    private final IUserInfoService userInfoService;
+
+    private final IHotelInfoService hotelInfoService;
 
     /**
      * 分页查询聊天记录
@@ -43,7 +53,8 @@ public class ChatRecordController {
      */
     @GetMapping("/contacts/hotel/{hotelId}")
     public R getContactsByHotelId(@PathVariable Integer hotelId) {
-        return R.ok(chatRecordService.getContactsByHotelId(hotelId));
+        HotelInfo hotelInfo = hotelInfoService.getOne(Wrappers.<HotelInfo>lambdaQuery().eq(HotelInfo::getUserId, hotelId));
+        return R.ok(chatRecordService.getContactsByHotelId(hotelInfo.getId()));
     }
 
     /**
@@ -52,8 +63,10 @@ public class ChatRecordController {
      * @return 联系人列表
      */
     @GetMapping("/contacts/user/{userId}")
-    public R getContactsByUserId(@PathVariable Integer userId) {
-        return R.ok(chatRecordService.getContactsByUserId(userId));
+    public R
+    getContactsByUserId(@PathVariable Integer userId) {
+        UserInfo userInfo = userInfoService.getOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getUserId, userId));
+        return R.ok(chatRecordService.getContactsByUserId(userInfo.getId()));
     }
 
     /**
@@ -77,7 +90,23 @@ public class ChatRecordController {
      * @return 结果
      */
     @PostMapping
-    public R sendMsg(@RequestBody ChatRecord chatRecord) {
+    public R sendMsg(ChatRecord chatRecord) {
+        chatRecord.setCreateTime(DateUtil.formatDateTime(new Date()));
+        return R.ok(chatRecordService.save(chatRecord));
+    }
+
+
+    /**
+     * 发送消息
+     *
+     * @param chatRecord 聊天记录
+     * @return 结果
+     */
+    @PostMapping("/defaultChat")
+    public R defaultChat(ChatRecord chatRecord) {
+        UserInfo userInfo = userInfoService.getOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getUserId, chatRecord.getUserId()));
+        chatRecord.setUserId(userInfo.getId());
+        chatRecord.setCreateTime(DateUtil.formatDateTime(new Date()));
         return R.ok(chatRecordService.save(chatRecord));
     }
 

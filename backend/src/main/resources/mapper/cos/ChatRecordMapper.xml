@@ -5,25 +5,27 @@
     <!-- 根据酒店ID获取沟通联系人列表 -->
     <select id="getContactsByHotelId" resultType="java.util.LinkedHashMap">
         SELECT DISTINCT cr.user_id          as         userId,
+                        cr.hotel_id       AS         hotelId,
                         ui.name             as         userName,
-                        ui.avatar           as         userAvatar,
+                        ui.avatar           as         userImages,
                         MAX(cr.create_time) as         lastMessageTime,
                         (SELECT content
                          FROM chat_record cr2
-                         WHERE cr2.user_id = cr.user_id
+                         WHERE cr2.hotel_id = cr.hotel_id
                            AND cr2.hotel_id = #{hotelId}
                          ORDER BY cr2.create_time DESC LIMIT 1) as lastMessage
         FROM chat_record cr
             LEFT JOIN user_info ui
-        ON cr.user_id = ui.user_id
+        ON cr.user_id = ui.id
         WHERE cr.hotel_id = #{hotelId}
-        GROUP BY cr.user_id, ui.name, ui.avatar
+        GROUP BY cr.user_id
         ORDER BY lastMessageTime DESC
     </select>
 
     <!-- 根据用户ID获取沟通联系人列表 -->
     <select id="getContactsByUserId" resultType="java.util.LinkedHashMap">
         SELECT DISTINCT cr.hotel_id         as         hotelId,
+                        cr.user_id          AS         userId,
                         hi.name             as         hotelName,
                         hi.images           as         hotelImage,
                         MAX(cr.create_time) as         lastMessageTime,
