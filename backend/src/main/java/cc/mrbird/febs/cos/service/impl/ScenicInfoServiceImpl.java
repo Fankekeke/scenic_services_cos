@@ -47,47 +47,37 @@ public class ScenicInfoServiceImpl extends ServiceImpl<ScenicInfoMapper, ScenicI
         // 获取所有景点信息
         List<ScenicInfo> allScenicList = list();
         for (ScenicInfo scenicInfo : allScenicList) {
-            if (StrUtil.isEmpty(scenicInfo.getPoint())) {
+            if (StrUtil.isEmpty(scenicInfo.getPoint()) || "{}".equals(scenicInfo.getPoint())) {
                 continue;
             }
-            double latitude = Double.parseDouble(scenicInfo.getPoint().split(",")[0]);
-            double longitude = Double.parseDouble(scenicInfo.getPoint().split(",")[1]);
+            double latitude = Double.parseDouble(scenicInfo.getPoint().split(",")[1]);
+            double longitude = Double.parseDouble(scenicInfo.getPoint().split(",")[0]);
             scenicInfo.setLongitude(longitude);
             scenicInfo.setLatitude(latitude);
         }
         UserInfo userInfo = userInfoService.getOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getUserId, userId));
-        // 1. 构建用户-景点评分矩阵
+        // 构建用户-景点评分矩阵
         Map<Integer, Map<Integer, Double>> userScenicRatingMatrix = buildUserScenicMatrix();
 
-        // 2. 计算用户相似度（基于余弦相似度）
+        // 计算用户相似度（基于余弦相似度）
         Map<Integer, Double> userSimilarity = calculateUserSimilarity(userInfo.getId(), userScenicRatingMatrix);
 
-        // 3. 预测评分
+        // 预测评分
         Map<Integer, Double> predictedRatings = predictRatings(userInfo.getId(), userSimilarity, userScenicRatingMatrix);
 
-        // 4. 根据预测评分排序并返回推荐结果
+        // 根据预测评分排序并返回推荐结果
         List<ScenicInfo> recommendedScenics = sortAndFilterScenics(predictedRatings, allScenicList);
 
-        // 如果协同过滤没有产生结果，回退到基于地理位置的推荐
-        if (recommendedScenics.isEmpty()) {
-            if (lat != null && lng != null) {
-                return allScenicList.stream()
-                        .sorted((s1, s2) -> {
-                            double distance1 = calculateDistance(lat, lng, s1.getLatitude(), s1.getLongitude());
-                            double distance2 = calculateDistance(lat, lng, s2.getLatitude(), s2.getLongitude());
-                            return Double.compare(distance1, distance2);
-                        })
-                        .limit(10)
-                        .collect(java.util.stream.Collectors.toList());
+        if (lat != null && lng != null) {
+            for (ScenicInfo scenicInfo : allScenicList) {
+                double distance = calculateDistance(lat, lng, scenicInfo.getLatitude(), scenicInfo.getLongitude());
+                scenicInfo.setDistance(distance);
             }
-
-            // 如果没有位置信息，则返回默认排序的景点列表
-            return allScenicList.stream()
-                    .limit(10)
-                    .collect(java.util.stream.Collectors.toList());
         }
-
-        return recommendedScenics;
+        // 如果没有位置信息，则返回默认排序的景点列表
+        return allScenicList.stream()
+                .sorted(Comparator.comparingDouble(ScenicInfo::getDistance)).limit(32)
+                .collect(Collectors.toList());
     }
 
     /**

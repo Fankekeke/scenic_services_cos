@@ -1,30 +1,30 @@
 <template>
   <div>
-    <a-form layout="horizontal">
-      <a-row :gutter="15" style="margin: 0">
-        <div>
-          <a-col :md="6" :sm="24">
-            <a-form-item
-              label="房间名称"
-              :labelCol="{span: 5}"
-              :wrapperCol="{span: 17, offset: 2}">
-              <a-input v-model="queryParams.name"/>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="24">
-            <a-form-item
-              label="地 区"
-              :labelCol="{span: 5}"
-              :wrapperCol="{span: 17, offset: 2}">
-              <a-input v-model="queryParams.address"/>
-            </a-form-item>
-          </a-col>
-        </div>
-        <span style="float: right; margin-top: 3px;">
-            <a-button type="primary" @click="search">查询</a-button>
-          </span>
-      </a-row>
-    </a-form>
+<!--    <a-form layout="horizontal">-->
+<!--      <a-row :gutter="15" style="margin: 0">-->
+<!--        <div>-->
+<!--          <a-col :md="6" :sm="24">-->
+<!--            <a-form-item-->
+<!--              label="房间名称"-->
+<!--              :labelCol="{span: 5}"-->
+<!--              :wrapperCol="{span: 17, offset: 2}">-->
+<!--              <a-input v-model="queryParams.name"/>-->
+<!--            </a-form-item>-->
+<!--          </a-col>-->
+<!--          <a-col :md="6" :sm="24">-->
+<!--            <a-form-item-->
+<!--              label="地 区"-->
+<!--              :labelCol="{span: 5}"-->
+<!--              :wrapperCol="{span: 17, offset: 2}">-->
+<!--              <a-input v-model="queryParams.address"/>-->
+<!--            </a-form-item>-->
+<!--          </a-col>-->
+<!--        </div>-->
+<!--        <span style="float: right; margin-top: 3px;">-->
+<!--            <a-button type="primary" @click="search">查询</a-button>-->
+<!--          </span>-->
+<!--      </a-row>-->
+<!--    </a-form>-->
     <a-row :gutter="15">
       <a-skeleton active v-if="loading" />
       <a-col :span="6" v-for="(item, index) in roomData" :key="index" style="margin-top: 30px" v-if="!loading">
@@ -97,6 +97,9 @@ export default {
       this.fetch({
         ...this.queryParams
       })
+    },
+    queryRoomTypeByScenic () {
+      
     },
     fetch (params = {}) {
       // 显示loading

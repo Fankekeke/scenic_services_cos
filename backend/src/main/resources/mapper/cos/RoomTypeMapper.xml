@@ -47,6 +47,51 @@
         ORDER BY typeNum DESC
     </select>
 
+    <!-- 查询房间类型列表 -->
+    <select id="queryList" resultType="java.util.LinkedHashMap">
+        SELECT
+        count(oi.type_id) as typeNum,
+        rt.id,
+        rt.name,
+        rt.price,
+        rt.images,
+        rt.area,
+        rt.room_num AS roomNum,
+        rt.hotel_id AS hotelId,
+        rt.content,
+        rt.create_date AS createDate,
+        hi.name AS hotelName,
+        hi.address,
+        hi.tag,
+        hi.content as hotelContent,
+        hi.point,
+        hi.policy,
+        hi.check_in AS checkIn
+        FROM
+        room_type rt
+        LEFT JOIN hotel_info hi ON (hi.id = rt.hotel_id)
+        LEFT JOIN order_info oi ON (oi.type_id = rt.id)
+        WHERE
+        1 = 1
+        <if test="roomType.name != null and roomType.name != ''">
+            AND rt.name LIKE CONCAT('%',#{roomType.name},'%')
+        </if>
+        <if test="roomType.hotelName != null and roomType.hotelName != ''">
+            AND hi.name LIKE CONCAT('%',#{roomType.hotelName},'%')
+        </if>
+        <if test="roomType.content != null and roomType.content != ''">
+            AND rt.content LIKE CONCAT('%',#{roomType.content},'%')
+        </if>
+        <if test="roomType.userId != null">
+            AND hi.user_id = #{roomType.userId}
+        </if>
+        <if test="roomType.address != null and roomType.address != ''">
+            AND hi.address LIKE CONCAT('%',#{roomType.address},'%')
+        </if>
+        GROUP BY rt.id
+        ORDER BY typeNum DESC
+    </select>
+
     <!-- 查询当前房间余量 -->
     <select id="roomNum" resultType="java.lang.Integer">
         SELECT

@@ -41,6 +41,17 @@ public class RoomTypeController {
     }
 
     /**
+     * 根据景点查询房间类型
+     *
+     * @param scenicId
+     * @return
+     */
+    @GetMapping("/queryRoomTypeByScenic")
+    public R queryRoomTypeByScenic(Integer scenicId) {
+        return R.ok(roomTypeService.queryRoomTypeByScenic(scenicId));
+    }
+
+    /**
      * 添加房间类型
      *
      * @param roomType

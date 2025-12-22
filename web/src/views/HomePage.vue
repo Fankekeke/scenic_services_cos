@@ -23,7 +23,7 @@
                 <div class="slide-content">
                   <h2 class="slide-title">欢迎来到美丽景区</h2>
                   <p class="slide-description">探索自然与文化的完美融合，享受难忘的旅行体验</p>
-                  <a-button type="primary" class="explore-btn" @click="exploreScenic">立即探索</a-button>
+<!--                  <a-button type="primary" class="explore-btn" @click="exploreScenic">立即探索</a-button>-->
                 </div>
               </div>
             </div>
@@ -33,7 +33,7 @@
                 <div class="slide-content">
                   <h2 class="slide-title">特色景点推荐</h2>
                   <p class="slide-description">发现隐藏的自然宝藏，感受独特的风景魅力</p>
-                  <a-button type="primary" class="explore-btn" @click="viewAttractions">查看详情</a-button>
+<!--                  <a-button type="primary" class="explore-btn" @click="viewAttractions">查看详情</a-button>-->
                 </div>
               </div>
             </div>
@@ -43,7 +43,7 @@
                 <div class="slide-content">
                   <h2 class="slide-title">最佳旅游季节</h2>
                   <p class="slide-description">四季皆有不同的美景，为您提供最佳游览建议</p>
-                  <a-button type="primary" class="explore-btn" @click="viewSeasons">查看攻略</a-button>
+<!--                  <a-button type="primary" class="explore-btn" @click="viewSeasons">查看攻略</a-button>-->
                 </div>
               </div>
             </div>
@@ -69,7 +69,7 @@
       </a-col>
     </a-row>
     <a-divider orientation="left">
-      <span style="font-size: 13px;margin-top: 15px">热门景点</span>
+<!--      <span style="font-size: 13px;margin-top: 15px">热门景点</span>-->
     </a-divider>
     <a-card :bordered="false" style="margin-left: -14px;margin-right: -14px;padding: 12px">
       <scenic/>

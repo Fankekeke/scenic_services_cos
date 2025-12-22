@@ -1,65 +1,69 @@
 <template>
-  <a-modal v-model="show" title="订单详情" @cancel="onClose" :width="800">
+  <a-modal v-model="show" title="订单详情" @cancel="onClose" :width="1400">
     <template slot="footer">
       <a-button key="back" @click="onClose" type="danger">
         关闭
       </a-button>
     </template>
     <div style="font-size: 13px" v-if="orderData !== null">
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">订单信息</span>
+      <a-row :gutter="12">
+        <a-col :span="12">
+          <a-row style="padding-left: 24px;padding-right: 24px;">
+            <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">订单信息</span>
+            </a-col>
+            <a-col :span="8"><b>订单编号：</b>
+              {{ orderData.code }}
+            </a-col>
+            <a-col :span="8"><b>价格：</b>
+              {{ orderData.price }} 元
+            </a-col>
+            <a-col :span="8"><b>订单状态：</b>
+              {{ orderData.orderStatus !== 0 ? '未使用' : '已销票' }}
+            </a-col>
+          </a-row>
+          <br/>
+          <a-row style="padding-left: 24px;padding-right: 24px;">
+            <a-col :span="8"><b>数 量：</b>{{ orderData.amount !== null ? orderData.amount + ' 张' : '- -' }}</a-col>
+            <a-col :span="8"><b>下单时间：</b>{{ orderData.createDate !== null ? orderData.createDate : '- -' }}</a-col>
+            <a-col :span="8"><b>销票时间：</b>{{ orderData.updateDate !== null ? orderData.updateDate : '- -' }}</a-col>
+          </a-row>
+          <br/>
+          <a-row style="padding-left: 24px;padding-right: 24px;">
+            <a-col :span="8"><b>用户编号：</b>{{ orderData.userCode !== null ? orderData.userCode : '- -' }}</a-col>
+            <a-col :span="8"><b>用户姓名：</b>{{ orderData.userName !== null ? orderData.userName : '- -' }}</a-col>
+            <a-col :span="8"><b>联系方式：</b>{{ orderData.email !== null ? orderData.email : '- -'}}</a-col>
+          </a-row>
         </a-col>
-        <a-col :span="8"><b>订单编号：</b>
-          {{ orderData.code }}
+        <a-col :span="12">
+          <a-row style="padding-left: 24px;padding-right: 24px;">
+            <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">景点信息</span>
+            </a-col>
+            <a-col :span="8"><b>景点名称：</b>
+              {{ orderData.scenicName }}
+            </a-col>
+            <a-col :span="8"><b>门票价格：</b>
+              ￥{{ orderData.scenicPrice }}
+            </a-col>
+            <a-col :span="8"><b>具体地址：</b>
+              <a-tooltip>
+                <template slot="title">
+                  {{ orderData.address }}
+                </template>
+                {{ orderData.address.slice(0, 8) }} ...
+              </a-tooltip>
+            </a-col>
+          </a-row>
+          <br/>
+          <a-row style="padding-left: 24px;padding-right: 24px;">
+            <a-col :span="8"><b>所属地区：</b>{{ orderData.area !== null ? orderData.area : '- -' }}</a-col>
+            <a-col :span="8"><b>热 度：</b>{{ orderData.hot !== null ? orderData.hot : '- -' }}</a-col>
+            <a-col :span="8"><b>等 级：</b>{{ orderData.level !== null ? orderData.level : '- -' }}</a-col>
+          </a-row>
+          <br/>
+          <a-row style="padding-left: 24px;padding-right: 24px;">
+            <a-col :span="8"><b>游 量：</b>{{ orderData.sold !== null ? orderData.sold : '- -' }}点</a-col>
+          </a-row>
         </a-col>
-        <a-col :span="8"><b>价格：</b>
-          {{ orderData.price }} 元
-        </a-col>
-        <a-col :span="8"><b>订单状态：</b>
-          {{ orderData.orderStatus !== 0 ? '未使用' : '已销票' }}
-        </a-col>
-      </a-row>
-      <br/>
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col :span="8"><b>数 量：</b>{{ orderData.amount !== null ? orderData.amount + ' 张' : '- -' }}</a-col>
-        <a-col :span="8"><b>下单时间：</b>{{ orderData.createDate !== null ? orderData.createDate : '- -' }}</a-col>
-        <a-col :span="8"><b>销票时间：</b>{{ orderData.updateDate !== null ? orderData.updateDate : '- -' }}</a-col>
-      </a-row>
-      <br/>
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col :span="8"><b>用户编号：</b>{{ orderData.userCode !== null ? orderData.userCode : '- -' }}</a-col>
-        <a-col :span="8"><b>用户姓名：</b>{{ orderData.userName !== null ? orderData.userName : '- -' }}</a-col>
-        <a-col :span="8"><b>联系方式：</b>{{ orderData.email !== null ? orderData.email : '- -'}}</a-col>
-      </a-row>
-      <br/>
-      <br/>
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">景点信息</span>
-        </a-col>
-        <a-col :span="8"><b>景点名称：</b>
-          {{ orderData.scenicName }}
-        </a-col>
-        <a-col :span="8"><b>门票价格：</b>
-          ￥{{ orderData.scenicPrice }}
-        </a-col>
-        <a-col :span="8"><b>具体地址：</b>
-          <a-tooltip>
-            <template slot="title">
-              {{ orderData.address }}
-            </template>
-            {{ orderData.address.slice(0, 8) }} ...
-          </a-tooltip>
-        </a-col>
-      </a-row>
-      <br/>
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col :span="8"><b>所属地区：</b>{{ orderData.area !== null ? orderData.area : '- -' }}</a-col>
-        <a-col :span="8"><b>热 度：</b>{{ orderData.hot !== null ? orderData.hot : '- -' }}</a-col>
-        <a-col :span="8"><b>等 级：</b>{{ orderData.level !== null ? orderData.level : '- -' }}</a-col>
-      </a-row>
-      <br/>
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col :span="8"><b>游 量：</b>{{ orderData.sold !== null ? orderData.sold : '- -' }}点</a-col>
       </a-row>
       <br/>
       <a-row style="padding-left: 24px;padding-right: 24px;"
@@ -81,11 +85,14 @@
         <a-col :span="24">{{ orderData.history !== null ? orderData.history : '暂无文化历史信息' }}</a-col>
       </a-row>
       <br/>
+      <hotel style="margin-bottom: 20px"/>
     </div>
   </a-modal>
 </template>
 
 <script>
+import Hotel from '../../home/hotel/Hotel.vue'
+
 function getBase64 (file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -96,6 +103,7 @@ function getBase64 (file) {
 }
 export default {
   name: 'OrderView',
+  components: {Hotel},
   props: {
     orderShow: {
       type: Boolean,

@@ -2,10 +2,7 @@ package cc.mrbird.febs.cos.controller;
 
 import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.*;
-import cc.mrbird.febs.cos.service.IOrderInfoService;
-import cc.mrbird.febs.cos.service.IScenicOrderService;
-import cc.mrbird.febs.cos.service.IUserInfoService;
-import cc.mrbird.febs.cos.service.PayService;
+import cc.mrbird.febs.cos.service.*;
 import cn.hutool.core.date.DateUtil;
 import com.alipay.api.AlipayApiException;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -33,6 +30,9 @@ public class PayController {
     @Autowired
     private IOrderInfoService orderInfoService;
 
+    @Autowired
+    private IScenicInfoService scenicInfoService;
+
     @GetMapping("/payOverBack")
     public void payOverBack(String message) {
         System.out.println(message);
@@ -49,6 +49,10 @@ public class PayController {
         ScenicOrder scenicOrder = scenicOrderService.getOne(Wrappers.<ScenicOrder>lambdaQuery().eq(ScenicOrder::getCode, orderCode));
         if (scenicOrder != null) {
             scenicOrder.setDelFlag(0);
+            // 添加景区已售量
+            ScenicInfo scenicInfo = scenicInfoService.getById(scenicOrder.getScenicId());
+            scenicInfo.setSold(scenicInfo.getSold() + 1);
+            scenicInfoService.updateById(scenicInfo);
             return R.ok(scenicOrderService.updateById(scenicOrder));
         }
         OrderInfo orderInfo = orderInfoService.getOne(Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getCode, orderCode));

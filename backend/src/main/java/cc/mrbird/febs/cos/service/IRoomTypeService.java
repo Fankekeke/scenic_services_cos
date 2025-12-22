@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * @author FanK
@@ -14,6 +15,7 @@ public interface IRoomTypeService extends IService<RoomType> {
 
     /**
      * 分页查询房间类型
+     *
      * @param page
      * @param roomType
      * @return
@@ -21,7 +23,16 @@ public interface IRoomTypeService extends IService<RoomType> {
     IPage<LinkedHashMap<String, Object>> roomTypeByPage(Page page, RoomType roomType);
 
     /**
+     * 查询房间类型
+     *
+     * @param scenicId
+     * @return
+     */
+    List<LinkedHashMap<String, Object>> queryRoomTypeByScenic(Integer scenicId);
+
+    /**
      * 查询当前房间余量
+     *
      * @param roomTypeId
      * @return
      */

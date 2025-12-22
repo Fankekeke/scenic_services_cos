@@ -46,7 +46,7 @@ public class ScenicInfo implements Serializable {
 
     private String level;
 
-    private String sold;
+    private Integer sold;
 
     /**
      * 评分
@@ -58,5 +58,8 @@ public class ScenicInfo implements Serializable {
 
     @TableField(exist = false)
     private Double longitude;
+
+    @TableField(exist = false)
+    private Double distance;
 
 }

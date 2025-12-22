@@ -69,8 +69,14 @@
 <script>
 import ScenicInfo from './ScenicView'
 import OrderAdd from './OrderAdd'
+import {mapState} from 'vuex'
 export default {
   name: 'Scenic',
+  computed: {
+    ...mapState({
+      currentUser: state => state.account.user
+    })
+  },
   components: {ScenicInfo, OrderAdd},
   data () {
     return {
@@ -93,9 +99,29 @@ export default {
     }
   },
   mounted () {
-    this.fetch()
+    // this.fetch()
+    this.getLocal()
   },
   methods: {
+    getLocal () {
+      let geolocation = new BMap.Geolocation()
+      geolocation.getCurrentPosition(r => {
+        console.log(r.point)
+        if (r.point) {
+          this.queryScenicRecommend(r.point.lat, r.point.lng)
+        }
+      }, {enableHighAccuracy: true})
+    },
+    queryScenicRecommend (lat, lng) {
+      this.$get('/cos/scenic-info/queryScenicRecommend', {
+        lat,
+        lng,
+        userId: this.currentUser.userId
+      }).then((r) => {
+        this.pagination.total = 1
+        this.scenicData = r.data.data
+      })
+    },
     view (record) {
       this.scenicView.data = record
       this.scenicView.visiable = true
