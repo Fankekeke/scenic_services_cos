@@ -53,6 +53,42 @@ public class PayController {
             ScenicInfo scenicInfo = scenicInfoService.getById(scenicOrder.getScenicId());
             scenicInfo.setSold(scenicInfo.getSold() + 1);
             scenicInfoService.updateById(scenicInfo);
+
+            // 定义二维码内容（可以是订单链接或订单号）
+            String content = scenicOrder.getCode().toString(); // 替换为实际域名
+            // 定义二维码保存路径
+            String filePath = "G:/Project/20251103景区管理服务平台/db/";
+            String fileName = "scenic_order_" +  scenicOrder.getCode() + ".png";
+            scenicOrder.setQrCode(fileName);
+            String fullPath = filePath + fileName;
+
+
+            // 创建目录（如果不存在）
+            java.io.File directory = new java.io.File(filePath);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            // 生成二维码
+            com.google.zxing.Writer writer = new com.google.zxing.qrcode.QRCodeWriter();
+            com.google.zxing.common.BitMatrix bitMatrix = null;
+            try {
+                bitMatrix = writer.encode(content,
+                        com.google.zxing.BarcodeFormat.QR_CODE, 300, 300);
+
+                // 保存为图片文件
+                java.nio.file.Path path = java.nio.file.Paths.get(fullPath);
+                java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(300, 300, java.awt.image.BufferedImage.TYPE_INT_RGB);
+                for (int x = 0; x < 300; x++) {
+                    for (int y = 0; y < 300; y++) {
+                        image.setRGB(x, y, bitMatrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
+                    }
+                }
+                javax.imageio.ImageIO.write(image, "PNG", path.toFile());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
             return R.ok(scenicOrderService.updateById(scenicOrder));
         }
         OrderInfo orderInfo = orderInfoService.getOne(Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getCode, orderCode));
@@ -98,11 +134,11 @@ public class PayController {
         UserInfo userInfo = userInfoService.getOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getUserId, orderInfo.getUserId()));
         orderInfo.setUserId(userInfo.getId());
         orderInfo.setCode("ORD-" + System.currentTimeMillis());
-        orderInfo.setOrderStatus(1);
+        orderInfo.setOrderStatus(0);
         orderInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
         orderInfo.setDelFlag(1);
         orderInfo.setStartDate(DateUtil.formatDate(new Date()));
-        orderInfo.setEndDate(DateUtil.formatDate(DateUtil.offsetDay(new Date(), 3)));
+        orderInfo.setEndDate(DateUtil.formatDate(DateUtil.offsetDay(new Date(), orderInfo.getDayNum())));
         orderInfoService.save(orderInfo);
         // 支付
         AlipayBean alipayBean = new AlipayBean();

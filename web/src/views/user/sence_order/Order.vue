@@ -171,6 +171,18 @@ export default {
           }
         }
       }, {
+        title: '核销二维码',
+        dataIndex: 'qrCode',
+        customRender: (text, record, index) => {
+          if (!record.qrCode) return <a-avatar shape="square" icon="user" />
+          return <a-popover>
+            <template slot="content">
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.qrCode } />
+            </template>
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.qrCode } />
+          </a-popover>
+        }
+      }, {
         title: '下单时间',
         dataIndex: 'createDate',
         customRender: (text, row, index) => {

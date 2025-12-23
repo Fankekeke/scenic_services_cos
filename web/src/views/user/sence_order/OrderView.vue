@@ -85,7 +85,7 @@
         <a-col :span="24">{{ orderData.history !== null ? orderData.history : '暂无文化历史信息' }}</a-col>
       </a-row>
       <br/>
-      <hotel style="margin-bottom: 20px"/>
+      <hotel style="margin-bottom: 20px" :scenicId="scenicId"/>
     </div>
   </a-modal>
 </template>
@@ -124,6 +124,7 @@ export default {
   },
   data () {
     return {
+      scenicId: null,
       loading: false,
       nowPoint: null,
       fileList: [],
@@ -134,9 +135,11 @@ export default {
   watch: {
     orderShow: function (value) {
       if (value) {
-        if (value && this.orderData.images !== null && this.orderData.images !== '') {
-          this.imagesInit(this.orderData.images)
-        }
+        this.scenicId = this.orderData.scenicId
+        console.log(this.scenicId)
+        // if (value && this.orderData.images !== null && this.orderData.images !== '') {
+        //   this.imagesInit(this.orderData.images)
+        // }
       }
     }
   },

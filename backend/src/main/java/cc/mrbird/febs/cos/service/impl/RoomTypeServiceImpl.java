@@ -57,6 +57,7 @@ public class RoomTypeServiceImpl extends ServiceImpl<RoomTypeMapper, RoomType> i
                 double latitude1 = Double.parseDouble(hotelPoint.split(",")[1]);
                 double longitude1 = Double.parseDouble(hotelPoint.split(",")[0]);
                 double distance = calculateDistance(latitude1, longitude1, latitude, longitude);
+                stringObjectLinkedHashMap.put("distance", distance);
 
                 if (distance <= 20) {
                     resultList.add(stringObjectLinkedHashMap);

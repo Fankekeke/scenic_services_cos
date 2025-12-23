@@ -67,6 +67,33 @@ public class ScenicOrderController {
     }
 
     /**
+     * 获取景点订单详情
+     *
+     * @param orderCode 订单ID
+     * @return 详情
+     */
+    @GetMapping("/queryScenicOrderDetail")
+    public R queryScenicOrderDetail(String orderCode) {
+        LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>() {
+            {
+                put("data", scenicOrderService.queryScenicOrderDetailByCode(orderCode));
+            }
+        };
+        return R.ok(result);
+    }
+
+    /**
+     * 核销订单
+     *
+     * @param orderCode 订单编号
+     * @return 结果
+     */
+    @GetMapping("/verifyOrder")
+    public R verifyOrder(String orderCode) {
+        return R.ok(scenicOrderService.update(Wrappers.<ScenicOrder>lambdaUpdate().set(ScenicOrder::getOrderStatus, "2").eq(ScenicOrder::getCode, orderCode)));
+    }
+
+    /**
      * 查询景点列表占比
      *
      * @return

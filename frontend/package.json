@@ -17,6 +17,7 @@
     "date-fns": "^1.29.0",
     "echarts": "^6.0.0",
     "enquire.js": "^2.1.6",
+    "jsqr": "^1.4.0",
     "vue": "^2.5.17",
     "vue-apexcharts": "^1.2.7",
     "vue-router": "^3.0.1",

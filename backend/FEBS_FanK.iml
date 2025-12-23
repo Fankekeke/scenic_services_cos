@@ -184,5 +184,9 @@
     <orderEntry type="library" name="Maven: com.github.houbb:opencc4j:1.8.1" level="project" />
     <orderEntry type="library" name="Maven: com.github.houbb:nlp-common:0.0.5" level="project" />
     <orderEntry type="library" name="Maven: com.github.houbb:sensitive-word-data:1.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.google.zxing:core:3.5.1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.zxing:javase:3.5.1" level="project" />
+    <orderEntry type="library" name="Maven: com.beust:jcommander:1.82" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.github.jai-imageio:jai-imageio-core:1.4.0" level="project" />
   </component>
 </module>

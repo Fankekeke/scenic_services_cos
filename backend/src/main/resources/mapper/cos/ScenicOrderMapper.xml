@@ -8,7 +8,9 @@
         so.id,
         so.code,
         so.price,
+        so.qr_code AS qrCode,
         so.amount,
+        so.scenic_id AS scenicId,
         so.order_status AS orderStatus,
         so.create_date AS createDate,
         so.update_date AS updateDate,
@@ -52,4 +54,42 @@
         </if>
         ORDER BY so.create_date DESC
     </select>
+
+    <!-- 查询订单详情 -->
+    <select id="queryScenicOrderDetailByCode" resultType="java.util.LinkedHashMap">
+        SELECT
+            so.id,
+            so.code,
+            so.price,
+            so.amount,
+            so.qr_code AS qrCode,
+            so.order_status AS orderStatus,
+            so.create_date AS createDate,
+            so.update_date AS updateDate,
+            si.scenic_name AS scenicName,
+            si.web_img AS webImg,
+            si.area,
+            si.scenic_price AS scenicPrice,
+            si.point,
+            si.hot,
+            si.history,
+            si.link,
+            si.address,
+            si.level,
+            si.sold,
+            ui.code AS userCode,
+            ui.name AS userName,
+            ui.email,
+            ui.phone,
+            ui.avatar
+        FROM
+            scenic_order so
+                LEFT JOIN scenic_info si ON ( si.id = so.scenic_id )
+                LEFT JOIN user_info ui ON ( ui.id = so.user_id )
+        WHERE
+            1 = 1
+          AND so.del_flag = 0
+          AND so.code = #{orderCode}
+    </select>
+
 </mapper>

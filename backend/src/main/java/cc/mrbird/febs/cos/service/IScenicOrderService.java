@@ -32,6 +32,14 @@ public interface IScenicOrderService extends IService<ScenicOrder> {
     List<LinkedHashMap<String, Object>> queryScenicTop(String date);
 
     /**
+     * 查询订单详情
+     *
+     * @param orderCode 订单ID
+     * @return 结果
+     */
+    LinkedHashMap<String, Object> queryScenicOrderDetailByCode(String orderCode);
+
+    /**
      * 年统计订单及收益
      *
      * @param date 年份

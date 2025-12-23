@@ -25,6 +25,7 @@
 <!--          </span>-->
 <!--      </a-row>-->
 <!--    </a-form>-->
+    <a-alert type="info" message="此景点20公里内酒店" show-icon></a-alert>
     <a-row :gutter="15">
       <a-skeleton active v-if="loading" />
       <a-col :span="6" v-for="(item, index) in roomData" :key="index" style="margin-top: 30px" v-if="!loading">
@@ -38,10 +39,19 @@
           <a-card-meta :title="item.name">
             <template slot="description">
               <p>￥ <span style="font-size: 16px;color: red">{{ item.price.toFixed(2) }}</span> 元</p>
+              <p v-if="item.hotelName" class="hotel-name">酒店：{{ item.hotelName }}</p>
+              <p v-if="item.distance" class="distance">距离景点：{{ item.distance.toFixed(2) }} 公里</p>
               {{ item.content.slice(0, 18) }}...
             </template>
           </a-card-meta>
         </a-card>
+      </a-col>
+      <a-col :span="24" v-if="roomData.length === 0 && !loading" class="no-data-container">
+        <div class="no-data-content">
+          <div class="no-data-icon">🏨</div>
+          <h3 class="no-data-title">附近没有酒店😭</h3>
+          <p class="no-data-desc">当前景点20公里范围内暂无酒店信息</p>
+        </div>
       </a-col>
     </a-row>
     <br/>
@@ -59,6 +69,11 @@
 import OrderAdd from './OrderAdd'
 export default {
   name: 'Hotel',
+  props: {
+    scenicId: {
+      type: Number
+    }
+  },
   components: {OrderAdd},
   data () {
     return {
@@ -76,8 +91,15 @@ export default {
       }
     }
   },
+  watch: {
+    scenicId () {
+      console.log(this.scenicId)
+      this.queryRoomTypeByScenic()
+    }
+  },
   mounted () {
-    this.fetch()
+    // this.queryRoomTypeByScenic()
+    // this.fetch()
   },
   methods: {
     orderAdd (record) {
@@ -99,7 +121,11 @@ export default {
       })
     },
     queryRoomTypeByScenic () {
-      
+      this.$get('/cos/room-type/queryRoomTypeByScenic', {
+        scenicId: this.scenicId
+      }).then((r) => {
+        this.roomData = r.data.data
+      })
     },
     fetch (params = {}) {
       // 显示loading
@@ -120,13 +146,54 @@ export default {
 }
 </script>
 
-<style scoped>
-/deep/ .ant-card-meta-title {
+<style scoped>/deep/ .ant-card-meta-title {
   font-size: 14px;
   margin-top: 10px;
 }
 /deep/ .ant-card-meta-description {
   font-size: 13px;
   margin-bottom: 8px;
+}
+/deep/ .hotel-name {
+  color: #666;
+  margin: 5px 0;
+  font-size: 12px;
+}
+/deep/ .distance {
+  color: #999;
+  margin: 5px 0;
+  font-size: 12px;
+}
+
+.no-data-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 0;
+}
+
+.no-data-content {
+  text-align: center;
+  padding: 40px 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.no-data-icon {
+  font-size: 60px;
+  margin-bottom: 16px;
+}
+
+.no-data-title {
+  font-size: 18px;
+  color: #333;
+  margin: 0 0 8px;
+}
+
+.no-data-desc {
+  font-size: 14px;
+  color: #999;
+  margin: 0;
 }
 </style>
