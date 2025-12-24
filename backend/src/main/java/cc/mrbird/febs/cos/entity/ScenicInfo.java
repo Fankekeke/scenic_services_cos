@@ -1,6 +1,7 @@
 package cc.mrbird.febs.cos.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -30,7 +31,7 @@ public class ScenicInfo implements Serializable {
 
     private String area;
 
-    private String scenicPrice;
+    private BigDecimal scenicPrice;
 
     private String point;
 

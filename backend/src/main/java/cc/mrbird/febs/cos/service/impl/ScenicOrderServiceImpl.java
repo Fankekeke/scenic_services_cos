@@ -334,10 +334,10 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
     @Override
     public List<LinkedHashMap<String, Object>> queryEvaluateRate() {
         List<Evaluation> evaluationList = evaluationMapper.selectList(Wrappers.<Evaluation>lambdaQuery().eq(Evaluation::getType, 2));
-        // 分数维度 从1.0到5.0
+        // 分数维度 从1.0到5.0，保留小数点后一位
         List<Double> scoreList = new ArrayList<>();
-        for (double i = 1.0; i <= 5.0; i += 0.1) {
-            scoreList.add(i);
+        for (int i = 10; i <= 50; i += 1) {
+            scoreList.add(i / 10.0);
         }
         if (CollectionUtil.isEmpty(evaluationList)) {
             return scoreList.stream().map(score -> {
@@ -349,7 +349,12 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
         }
 
         Map<Double, List<Evaluation>> scoreMap = evaluationList.stream()
-                .collect(Collectors.groupingBy(Evaluation::getScore));
+                .collect(Collectors.groupingBy(evaluation -> {
+                    // 对评价分数进行四舍五入到一位小数
+                    double originalScore = evaluation.getScore();
+                    BigDecimal roundedScore = new BigDecimal(originalScore).setScale(1, BigDecimal.ROUND_HALF_UP);
+                    return roundedScore.doubleValue();
+                }));
 
         List<LinkedHashMap<String, Object>> result = new ArrayList<>();
         for (Double score : scoreList) {
@@ -368,6 +373,72 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
      */
     @Override
     public List<LinkedHashMap<String, Object>> queryAreaScenicNumRate() {
+        // 获取所有景点信息
+        List<ScenicInfo> scenicInfoList = scenicInfoService.list();
+
+        // 提取省份并统计数量
+        Map<String, Integer> provinceCountMap = new HashMap<>();
+        for (ScenicInfo scenicInfo : scenicInfoList) {
+            String address = scenicInfo.getArea();
+            if (StrUtil.isNotEmpty(address)) {
+                String province = extractProvince(address);
+                if (StrUtil.isNotEmpty(province)) {
+                    provinceCountMap.merge(province, 1, Integer::sum);
+                }
+            }
+        }
+
+        // 转换为结果格式
+        List<LinkedHashMap<String, Object>> result = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : provinceCountMap.entrySet()) {
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+            map.put("province", entry.getKey());
+            map.put("count", entry.getValue());
+            result.add(map);
+        }
+        return result;
+    }
+
+    /**
+     * 从地址中提取省份
+     *
+     * @param address 完整地址
+     * @return 省份名称
+     */
+    private String extractProvince(String address) {
+        if (StrUtil.isEmpty(address)) {
+            return null;
+        }
+
+        // 处理常见省份格式，如"江苏·南京·玄武区"或"江苏省南京市玄武区"
+        if (address.contains("·")) {
+            // 处理"江苏·南京·玄武区"这种格式
+            String[] parts = address.split("·");
+            if (parts.length > 0) {
+                String provincePart = parts[0];
+                // 去除可能的省份后缀
+                if (provincePart.endsWith("省")) {
+                    return provincePart.substring(0, provincePart.length() - 1);
+                }
+                return provincePart;
+            }
+        } else {
+            // 处理"江苏省南京市玄武区"这种格式
+            if (address.length() >= 2) {
+                String potentialProvince = address.substring(0, 2);
+                if (potentialProvince.endsWith("省") || potentialProvince.endsWith("市") ||
+                        potentialProvince.equals("北京") || potentialProvince.equals("上海") ||
+                        potentialProvince.equals("天津") || potentialProvince.equals("重庆")) {
+                    // 包含省份或直辖市
+                    if (potentialProvince.endsWith("省")) {
+                        return potentialProvince.substring(0, potentialProvince.length() - 1);
+                    } else {
+                        return potentialProvince;
+                    }
+                }
+            }
+        }
+
         return null;
     }
 
@@ -378,7 +449,28 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
      */
     @Override
     public List<LinkedHashMap<String, Object>> queryScenicLevelRate() {
-        return null;
+        // 获取所有景点信息
+        List<ScenicInfo> scenicInfoList = scenicInfoService.list();
+        int totalCount = scenicInfoList.size();
+
+        // 统计各等级的景点数量
+        Map<String, Integer> levelCountMap = new HashMap<>();
+        for (ScenicInfo scenicInfo : scenicInfoList) {
+            String level = scenicInfo.getLevel();
+            if (StrUtil.isNotEmpty(level)) {
+                levelCountMap.merge(level, 1, Integer::sum);
+            }
+        }
+        // 转换为结果格式，包含占比
+        List<LinkedHashMap<String, Object>> result = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : levelCountMap.entrySet()) {
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+            map.put("level", entry.getKey());
+            map.put("count", entry.getValue());
+            map.put("percentage", (double) entry.getValue() / totalCount * 100);
+            result.add(map);
+        }
+        return result;
     }
 
     /**
@@ -388,6 +480,67 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
      */
     @Override
     public List<LinkedHashMap<String, Object>> queryPriceStepRate() {
+        // 获取所有景点信息
+        List<ScenicInfo> scenicInfoList = scenicInfoService.list();
+
+        // 定义价格区间
+        int[] priceRanges = {0, 50, 100, 150, 200, 250, 300, 350, 400, 500, 600};
+        String[] rangeLabels = {"0-50", "50-100", "100-150", "150-200", "200-250", "250-350", "350-400", "400-500", "500-600"};
+
+        // 初始化各区间计数器
+        Map<String, Integer> rangeCountMap = new HashMap<>();
+        for (String label : rangeLabels) {
+            rangeCountMap.put(label, 0);
+        }
+        // 统计每个景点的价格所属区间
+        for (ScenicInfo scenicInfo : scenicInfoList) {
+            BigDecimal price = scenicInfo.getScenicPrice();
+            if (price != null) {
+                int priceInt = price.intValue();
+                String rangeLabel = getPriceRangeLabel(priceInt, priceRanges, rangeLabels);
+                if (rangeLabel != null) {
+                    rangeCountMap.merge(rangeLabel, 1, Integer::sum);
+                }
+            }
+        }
+        // 转换为结果格式
+        List<LinkedHashMap<String, Object>> result = new ArrayList<>();
+        for (String rangeLabel : rangeLabels) {
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+            map.put("range", rangeLabel);
+            map.put("count", rangeCountMap.get(rangeLabel));
+            result.add(map);
+        }
+        return result;
+    }
+
+    /**
+     * 根据价格获取所属区间标签
+     *
+     * @param price 价格
+     * @param priceRanges 价格区间数组
+     * @param rangeLabels 区间标签数组
+     * @return 区间标签
+     */
+    private String getPriceRangeLabel(int price, int[] priceRanges, String[] rangeLabels) {
+        for (int i = 0; i < priceRanges.length - 1; i++) {
+            if (price >= priceRanges[i] && price < priceRanges[i + 1]) {
+                // 处理特定区间标签
+                if (i == 0) return "0-50";
+                else if (i == 1) return "50-100";
+                else if (i == 2) return "100-150";
+                else if (i == 3) return "150-200";
+                else if (i == 4) return "200-250";
+                else if (i == 5) return "250-350";
+                else if (i == 6) return "350-400";
+                else if (i == 7) return "400-500";
+                else if (i == 8) return "500-600";
+            }
+        }
+        // 如果价格超过最大区间，归入最大区间
+        if (price >= priceRanges[priceRanges.length - 1]) {
+            return "500-600";
+        }
         return null;
     }
 
@@ -398,6 +551,123 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
      */
     @Override
     public List<LinkedHashMap<String, Object>> queryOrderWordCloud() {
-        return null;
+        List<ScenicInfo> scenicInfoList = scenicInfoService.list();
+        List<String> wordList = new ArrayList<>();
+
+        // 收集景点名称和描述中的关键词
+        for (ScenicInfo scenicInfo : scenicInfoList) {
+            if (StrUtil.isNotEmpty(scenicInfo.getHistory())) {
+                wordList.addAll(segmentWords(scenicInfo.getHistory()));
+            }
+        }
+
+        // 统计词频
+        Map<String, Integer> wordCountMap = new HashMap<>();
+        for (String word : wordList) {
+            if (StrUtil.isNotEmpty(word) && !isStopWord(word)) {
+                wordCountMap.merge(word, 1, Integer::sum);
+            }
+        }
+
+        // 按词频排序并取前50个
+        List<LinkedHashMap<String, Object>> result = wordCountMap.entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .limit(50)
+                .map(entry -> {
+                    LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+                    map.put("word", entry.getKey());
+                    map.put("count", entry.getValue());
+                    return map;
+                })
+                .collect(Collectors.toList());
+
+        return result;
+    }
+
+    /**
+     * 判断字符是否为中文
+     *
+     * @param c 待判断字符
+     * @return 是否为中文
+     */
+    private boolean isChineseChar(char c) {
+        return c >= 0x4e00 && c <= 0x9fa5;
+    }
+
+    /**
+     * 简单的中文分词处理
+     *
+     * @param text 待分词的文本
+     * @return 分词结果列表
+     */
+    private List<String> segmentWords(String text) {
+        List<String> words = new ArrayList<>();
+        StringBuilder currentWord = new StringBuilder();
+        for (char c : text.toCharArray()) {
+            // 判断是否为中文字符
+            if (isChineseChar(c)) {
+                currentWord.append(c);
+            } else {
+                // 遇到非中文字符，将当前词加入列表
+                if (currentWord.length() > 0) {
+                    String word = currentWord.toString();
+                    if (word.length() >= 2) { // 过滤单个字符
+                        words.add(word);
+                    }
+                    currentWord = new StringBuilder();
+                }
+            }
+        }
+        // 处理最后一个词
+        if (currentWord.length() > 0) {
+            String word = currentWord.toString();
+            if (word.length() >= 2) {
+                words.add(word);
+            }
+        }
+        return words;
+    }
+
+
+    /**
+     * 判断是否为停用词
+     *
+     * @param word 待判断词汇
+     * @return 是否为停用词
+     */
+    private boolean isStopWord(String word) {
+        // 定义常见停用词
+        Set<String> stopWords = new HashSet<>();
+        stopWords.add("的");
+        stopWords.add("了");
+        stopWords.add("在");
+        stopWords.add("是");
+        stopWords.add("我");
+        stopWords.add("有");
+        stopWords.add("和");
+        stopWords.add("就");
+        stopWords.add("不");
+        stopWords.add("人");
+        stopWords.add("都");
+        stopWords.add("一");
+        stopWords.add("一个");
+        stopWords.add("上");
+        stopWords.add("也");
+        stopWords.add("很");
+        stopWords.add("到");
+        stopWords.add("说");
+        stopWords.add("要");
+        stopWords.add("去");
+        stopWords.add("你");
+        stopWords.add("会");
+        stopWords.add("着");
+        stopWords.add("没有");
+        stopWords.add("看");
+        stopWords.add("好");
+        stopWords.add("自己");
+        stopWords.add("这");
+
+        return stopWords.contains(word);
     }
 }
