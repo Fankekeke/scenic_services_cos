@@ -54,4 +54,18 @@ public interface IScenicOrderService extends IService<ScenicOrder> {
      * @return 结果
      */
     LinkedHashMap<String, Object> selectStoreStatisticsByMonth(String date);
+
+    /**
+     * 景点评价占比
+     *
+     * @return 评价占比
+     */
+    List<LinkedHashMap<String, Object>> queryEvaluateRate();
+
+    /**
+     * 景点区域占比
+     *
+     * @return 区域占比
+     */
+    List<LinkedHashMap<String, Object>> queryAreaScenicNumRate();
 }

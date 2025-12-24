@@ -1,7 +1,9 @@
 package cc.mrbird.febs.cos.service.impl;
 
+import cc.mrbird.febs.cos.dao.EvaluationMapper;
 import cc.mrbird.febs.cos.dao.OrderInfoMapper;
 import cc.mrbird.febs.cos.dao.ScenicInfoMapper;
+import cc.mrbird.febs.cos.entity.Evaluation;
 import cc.mrbird.febs.cos.entity.OrderInfo;
 import cc.mrbird.febs.cos.entity.ScenicInfo;
 import cc.mrbird.febs.cos.entity.ScenicOrder;
@@ -36,6 +38,8 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
     private final OrderInfoMapper orderInfoMapper;
 
     private final IScenicInfoService scenicInfoService;
+
+    private final EvaluationMapper evaluationMapper;
 
     @Override
     public IPage<LinkedHashMap<String, Object>> scenicInfoByPage(Page page, ScenicOrder scenicOrder) {
@@ -320,5 +324,50 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
         }
         result.put("saleTypeRankMapCopy", saleTypeRankMapCopy);
         return result;
+    }
+
+    /**
+     * 景点评价占比
+     *
+     * @return 评价占比
+     */
+    @Override
+    public List<LinkedHashMap<String, Object>> queryEvaluateRate() {
+        List<Evaluation> evaluationList = evaluationMapper.selectList(Wrappers.<Evaluation>lambdaQuery().eq(Evaluation::getType, 2));
+        // 分数维度 从1.0到5.0
+        List<Double> scoreList = new ArrayList<>();
+        for (double i = 1.0; i <= 5.0; i += 0.1) {
+            scoreList.add(i);
+        }
+        if (CollectionUtil.isEmpty(evaluationList)) {
+            return scoreList.stream().map(score -> {
+                LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+                map.put("score", score);
+                map.put("num", 0);
+                return map;
+            }).collect(Collectors.toList());
+        }
+
+        Map<Double, List<Evaluation>> scoreMap = evaluationList.stream()
+                .collect(Collectors.groupingBy(Evaluation::getScore));
+
+        List<LinkedHashMap<String, Object>> result = new ArrayList<>();
+        for (Double score : scoreList) {
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+            map.put("score", score);
+            map.put("num", scoreMap.get(score) != null ? scoreMap.get(score).size() : 0);
+            result.add(map);
+        }
+        return result;
+    }
+
+    /**
+     * 景点区域占比
+     *
+     * @return 区域占比
+     */
+    @Override
+    public List<LinkedHashMap<String, Object>> queryAreaScenicNumRate() {
+        return null;
     }
 }

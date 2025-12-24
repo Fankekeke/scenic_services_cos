@@ -182,4 +182,23 @@ public class ScenicOrderController {
         return R.ok(scenicOrderService.selectStoreStatisticsByMonth(date));
     }
 
+    /**
+     * 统计评价占比
+     *
+     * @return 评价占比
+     */
+    @GetMapping("/queryEvaluateRate")
+    public R queryEvaluateRate() {
+        return R.ok(scenicOrderService.queryEvaluateRate());
+    }
+
+    /**
+     * 区域景点数量占比
+     *
+     * @return 区域景点数量占比
+     */
+    @GetMapping("/queryAreaScenicNumRate")
+    public R queryAreaScenicNumRate() {
+        return R.ok(scenicOrderService.queryAreaScenicNumRate());
+    }
 }
