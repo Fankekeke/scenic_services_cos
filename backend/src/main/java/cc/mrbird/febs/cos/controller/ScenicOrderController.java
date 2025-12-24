@@ -201,4 +201,34 @@ public class ScenicOrderController {
     public R queryAreaScenicNumRate() {
         return R.ok(scenicOrderService.queryAreaScenicNumRate());
     }
+
+    /**
+     * 景点等级占比
+     *
+     * @return 景点等级占比
+     */
+    @GetMapping("/queryScenicLevelRate")
+    public R queryScenicLevelRate() {
+        return R.ok(scenicOrderService.queryScenicLevelRate());
+    }
+
+    /**
+     * 价格分布占比
+     *
+     * @return 价格分布占比
+     */
+    @GetMapping("/queryPriceStepRate")
+    public R queryPriceStepRate() {
+        return R.ok(scenicOrderService.queryPriceStepRate());
+    }
+
+    /**
+     * 订单词云
+     *
+     * @return 订单词云
+     */
+    @GetMapping("/queryOrderWordCloud")
+    public R queryOrderWordCloud() {
+        return R.ok(scenicOrderService.queryOrderWordCloud());
+    }
 }

@@ -68,4 +68,25 @@ public interface IScenicOrderService extends IService<ScenicOrder> {
      * @return 区域占比
      */
     List<LinkedHashMap<String, Object>> queryAreaScenicNumRate();
+
+    /**
+     * 景点等级占比
+     *
+     * @return 等级占比
+     */
+    List<LinkedHashMap<String, Object>> queryScenicLevelRate();
+
+    /**
+     * 景点价格分布占比
+     *
+     * @return 价格分布占比
+     */
+    List<LinkedHashMap<String, Object>> queryPriceStepRate();
+
+    /**
+     * 订单词云
+     *
+     * @return 订单词云
+     */
+    List<LinkedHashMap<String, Object>> queryOrderWordCloud();
 }

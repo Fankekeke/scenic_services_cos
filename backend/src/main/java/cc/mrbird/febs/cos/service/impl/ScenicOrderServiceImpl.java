@@ -370,4 +370,34 @@ public class ScenicOrderServiceImpl extends ServiceImpl<ScenicOrderMapper, Sceni
     public List<LinkedHashMap<String, Object>> queryAreaScenicNumRate() {
         return null;
     }
+
+    /**
+     * 景点等级占比
+     *
+     * @return 等级占比
+     */
+    @Override
+    public List<LinkedHashMap<String, Object>> queryScenicLevelRate() {
+        return null;
+    }
+
+    /**
+     * 景点价格分布占比
+     *
+     * @return 价格分布占比
+     */
+    @Override
+    public List<LinkedHashMap<String, Object>> queryPriceStepRate() {
+        return null;
+    }
+
+    /**
+     * 订单词云
+     *
+     * @return 订单词云
+     */
+    @Override
+    public List<LinkedHashMap<String, Object>> queryOrderWordCloud() {
+        return null;
+    }
 }
