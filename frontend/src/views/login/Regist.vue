@@ -1,6 +1,6 @@
 <template>
   <a-card :bordered="false" hoverable style="margin-top: 130px">
-    <div style="text-align: left;font-size: 14px;margin-bottom: 30px"><b>一体式旅游管理平台</b></div>
+    <div style="text-align: left;font-size: 14px;margin-bottom: 30px"><b>景区管理服务平台</b></div>
     <div class="user-layout-register">
       <a-form ref="formRegister" :autoFormCreate="(form)=>{this.form = form}" id="formRegister">
         <a-form-item

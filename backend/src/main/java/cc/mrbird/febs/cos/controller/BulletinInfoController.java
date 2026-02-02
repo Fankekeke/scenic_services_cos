@@ -8,6 +8,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +33,7 @@ public class BulletinInfoController {
      * @param bulletinInfo
      * @return
      */
+    @ApiOperation(value = "分页获取公告信息", notes = "分页获取公告信息")
     @GetMapping("/page")
     public R page(Page page, BulletinInfo bulletinInfo) {
         return R.ok(bulletinInfoService.getBulletinByPage(page, bulletinInfo));

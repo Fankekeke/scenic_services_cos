@@ -90,6 +90,6 @@ febs:
         num: 1000
   shiro:
     # 后端免认证接口 url
-    anonUrl: /login,/logout/**,/regist,/regist/user,/user/check/**,/file/**,/api/**,/imagesWeb/**,/cos/user-info/register/email,/cos/user-info/verification/check,/cos/pay/payOverBack
+    anonUrl: /login,/logout/**,/regist,/regist/user,/user/check/**,/file/**,/api/**,/imagesWeb/**,/cos/user-info/register/email,/cos/user-info/verification/check,/cos/pay/payOverBack,/doc.html,/webjars/**,/swagger-resources/**,/v2/api-docs
     # token有效期，单位秒
     jwtTimeOut: 3600

@@ -4,21 +4,27 @@ import cc.mrbird.febs.common.utils.R;
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
+import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversation;
+import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationOutput;
+import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationParam;
+import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationResult;
 import com.alibaba.dashscope.common.Message;
+import com.alibaba.dashscope.common.MultiModalMessage;
 import com.alibaba.dashscope.common.Role;
 import com.alibaba.dashscope.exception.InputRequiredException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.google.common.base.Throwables;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.alibaba.dashscope.utils.JsonUtils;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -66,6 +72,32 @@ public class AliAliController {
 
         String combinedContent = String.join("\n---\n", allContents); // 使用 "---" 分隔多个回复内容
         return R.ok(combinedContent);
+    }
+
+    @PostMapping(value = "recognitionImage")
+    public R recognitionImage(@RequestParam("avatar") String imageBase64) throws NoApiKeyException, InputRequiredException {
+        try {
+//            String imageBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(file.getBytes());
+            MultiModalMessage userMessage = MultiModalMessage.builder().role(Role.USER.getValue())
+                    .content(Arrays.asList(new HashMap<String, Object>(){{put("image", imageBase64);}},
+                            new HashMap<String, Object>(){{put("text", "识别图中景点人流量（大致估量），给用户进行建议，25字内");}})).build();
+
+            MultiModalConversationParam param = MultiModalConversationParam.builder()
+                    .model(MultiModalConversation.Models.QWEN_VL_PLUS)
+                    .message(userMessage)
+                    .apiKey("sk-fkebb4821588054a66aa1951d7f239f77c")
+                    .build();
+            MultiModalConversation conv = new MultiModalConversation();
+            MultiModalConversationResult result = conv.call(param);
+            MultiModalConversationOutput.Choice ss = result.getOutput().getChoices().get(0);
+            String combinedContent = ss.getMessage().getContent().get(0).get("text").toString(); // 合并多个回复内容
+            return R.ok(combinedContent);
+
+        } catch (Exception e) {
+            System.err.println("API 调用失败: " + e.getMessage());
+            e.printStackTrace();
+            return R.error(e.getMessage());
+        }
     }
 
 }

@@ -241,6 +241,7 @@ export default {
 
       if (code) {
         this.$message.success('二维码内容: ' + code.data)
+        this.queryScenicOrderDetail(code.data)
       } else {
         this.$message.warning('未检测到二维码')
       }

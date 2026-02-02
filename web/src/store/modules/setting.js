@@ -12,7 +12,7 @@ export default {
     isMobile: false,
     theme: db.get('THEME', 'light'),
     layout: db.get('LAYOUT', 'side'),
-    systemName: '小至旅游',
+    systemName: '',
     copyright: `${new Date().getFullYear()} <a href="https://gitee.com/Berserker_FanK/EVA-2" target="_blank">Fank</a>`,
     multipage: getBooleanValue(db.get('MULTIPAGE'), true),
     fixSiderbar: getBooleanValue(db.get('FIX_SIDERBAR'), true),

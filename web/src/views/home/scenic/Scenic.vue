@@ -106,6 +106,7 @@ export default {
     getLocal () {
       let geolocation = new BMap.Geolocation()
       geolocation.getCurrentPosition(r => {
+        console.log(r)
         console.log(r.point)
         if (r.point) {
           this.queryScenicRecommend(r.point.lat, r.point.lng)
