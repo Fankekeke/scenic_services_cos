@@ -74,6 +74,7 @@
       </a-table>
     </div>
     <order-view
+      v-if="orderView.visiable"
       @close="handleorderViewClose"
       :orderShow="orderView.visiable"
       :orderData="orderView.data">

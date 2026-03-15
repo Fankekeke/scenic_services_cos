@@ -9,6 +9,7 @@
         bi.title,
         bi.content,
         bi.images,
+        bi.type,
         bi.date AS createDate,
         bi.publisher
         FROM

@@ -19,6 +19,20 @@
           </a-form-item>
         </a-col>
         <a-col :span="12">
+          <a-form-item label='公告类型' v-bind="formItemLayout">
+            <a-select v-decorator="[
+              'type',
+              {
+                rules: [{ required: true, message: '请选择公告类型!' }]
+              }
+            ]">
+              <a-select-option value="1">景区公告</a-select-option>
+              <a-select-option value="2">活动通知</a-select-option>
+              <a-select-option value="3">紧急消息</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
           <a-form-item label='上传人' v-bind="formItemLayout">
             <a-input v-decorator="[
             'publisher',
@@ -131,7 +145,7 @@ export default {
     },
     setFormValues ({...bulletin}) {
       this.rowId = bulletin.id
-      let fields = ['title', 'content', 'publisher']
+      let fields = ['title', 'content', 'publisher', 'type']
       let obj = {}
       Object.keys(bulletin).forEach((key) => {
         if (key === 'images') {

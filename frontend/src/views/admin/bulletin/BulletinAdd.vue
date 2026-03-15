@@ -1,3 +1,4 @@
+
 <template>
   <a-modal v-model="show" title="新增公告" @cancel="onClose" :width="800">
     <template slot="footer">
@@ -14,8 +15,22 @@
           <a-form-item label='公告标题' v-bind="formItemLayout">
             <a-input v-decorator="[
             'title',
-            { rules: [{ required: true, message: '请输入名称!' }] }
+            { rules: [{ required: true, message: '请输入标题!' }] }
             ]"/>
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item label='公告类型' v-bind="formItemLayout">
+            <a-select v-decorator="[
+              'type',
+              {
+                rules: [{ required: true, message: '请选择公告类型!' }]
+              }
+            ]">
+              <a-select-option value="1">景区公告</a-select-option>
+              <a-select-option value="2">活动通知</a-select-option>
+              <a-select-option value="3">紧急消息</a-select-option>
+            </a-select>
           </a-form-item>
         </a-col>
         <a-col :span="12">
@@ -30,7 +45,7 @@
           <a-form-item label='公告内容' v-bind="formItemLayout">
             <a-textarea :rows="6" v-decorator="[
             'content',
-             { rules: [{ required: true, message: '请输入名称!' }] }
+             { rules: [{ required: true, message: '请输入内容!' }] }
             ]"/>
           </a-form-item>
         </a-col>
@@ -61,8 +76,7 @@
   </a-modal>
 </template>
 
-<script>
-import {mapState} from 'vuex'
+<script>import {mapState} from 'vuex'
 function getBase64 (file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -135,7 +149,6 @@ export default {
       this.form.validateFields((err, values) => {
         values.images = images.length > 0 ? images.join(',') : null
         if (!err) {
-          values.publisher = this.currentUser.userId
           this.loading = true
           this.$post('/cos/bulletin-info', {
             ...values
@@ -153,5 +166,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

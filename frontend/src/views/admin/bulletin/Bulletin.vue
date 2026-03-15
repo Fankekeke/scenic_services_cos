@@ -147,6 +147,18 @@ export default {
         scopedSlots: { customRender: 'contentShow' },
         width: 600
       }, {
+        title: '类型',
+        dataIndex: 'type',
+        customRender: (text, row, index) => {
+          const typeMap = {
+            '1': '景区公告',
+            '2': '活动通知',
+            '3': '紧急消息'
+          }
+          return typeMap[text] || '- -'
+        },
+        width: 120
+      }, {
         title: '发布时间',
         dataIndex: 'createDate',
         customRender: (text, row, index) => {

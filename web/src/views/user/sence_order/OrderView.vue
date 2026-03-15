@@ -135,13 +135,15 @@ export default {
   watch: {
     orderShow: function (value) {
       if (value) {
-        this.scenicId = this.orderData.scenicId
-        console.log(this.scenicId)
         // if (value && this.orderData.images !== null && this.orderData.images !== '') {
         //   this.imagesInit(this.orderData.images)
         // }
       }
     }
+  },
+  mounted () {
+    this.scenicId = this.orderData.scenicId
+    console.log(this.scenicId)
   },
   methods: {
     handleCancel () {
