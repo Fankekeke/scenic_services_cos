@@ -42,6 +42,7 @@
         <if test="evaluation.roomName != null and evaluation.roomName != ''">
             AND rt.name LIKE CONCAT('%',#{evaluation.roomName},'%')
         </if>
+        group by eva.id
         ORDER BY eva.create_date DESC
     </select>
 
@@ -77,6 +78,7 @@
         <if test="evaluation.hotelName != null and evaluation.hotelName != ''">
             AND si.scenic_name LIKE CONCAT('%',#{evaluation.hotelName},'%')
         </if>
+        group by eva.id
         ORDER BY eva.create_date DESC
     </select>
 
@@ -103,6 +105,7 @@
         <if test="scenicId != null and scenicId != ''">
             AND eva.scenic_id = #{scenicId}
         </if>
+        group by eva.id
         ORDER BY eva.create_date DESC
     </select>
 
